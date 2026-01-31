@@ -7,68 +7,46 @@
 body{
 margin:0;
 font-family:"Segoe UI",Arial;
-background:linear-gradient(135deg,#2c003e,#ff4f81);
+background:linear-gradient(135deg,#4b0035,#ff5b8a);
 height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-overflow:hidden;
 color:white;
 }
 
 .card{
-background:rgba(255,255,255,.12);
+background:rgba(255,255,255,.15);
 padding:40px;
 border-radius:30px;
-width:380px;
 text-align:center;
-backdrop-filter:blur(15px);
+width:380px;
+backdrop-filter:blur(12px);
 box-shadow:0 25px 60px rgba(0,0,0,.4);
 }
 
-.names{
-font-size:28px;
-margin:10px 0;
-font-weight:600;
-}
+h2{margin:0;}
+p{font-size:14px;line-height:1.6;opacity:.9;}
 
 .photo{
-width:170px;height:170px;
+width:150px;
+height:150px;
 border-radius:50%;
-object-fit:cover;
 border:4px solid white;
-box-shadow:0 0 20px rgba(255,255,255,.6);
-cursor:pointer;
-transition:.5s;
+object-fit:cover;
+margin:12px 0;
 }
 
 button{
 margin-top:10px;
 padding:10px 25px;
-border-radius:25px;
+border-radius:20px;
 border:none;
 background:#ffd1dc;
 cursor:pointer;
 }
 
-input[type=range]{
-width:160px;
-}
-
-/* fullscreen gallery */
-#full{
-position:fixed;
-inset:0;
-background:black;
-display:none;
-justify-content:center;
-align-items:center;
-}
-#full img{
-max-width:90%;
-max-height:90%;
-}
-
+input{width:160px;}
 </style>
 </head>
 
@@ -80,74 +58,48 @@ max-height:90%;
 
 <div class="card">
 
-<div class="names">Venuprasanth ❤️ Madhusri</div>
+<h2>Venuprasanth ❤️ Madhusri</h2>
 
-<img id="mainPhoto" src="vmlove1.jpeg" class="photo" onclick="openFull()">
+<p>
+Two hearts met, one beautiful journey began.  
+Every smile, every moment, every dream –  
+we walk together hand in hand.
+</p>
 
-<br>
+<img src="vmlove1.jpeg" class="photo">
+
+<p>
+You are my today, my tomorrow and my forever.  
+Together we create memories that last a lifetime.
+</p>
 
 <button id="musicBtn" onclick="toggleMusic()">Play Music 🎵</button><br>
 
-<input type="range" min="0" max="1" step="0.1" onchange="setVol(this.value)">
+<input type="range" min="0" max="1" step="0.1" onchange="bgm.volume=this.value">
 
 <br><br>
 
-<button onclick="openInvite()">Marriage Invitation 💍</button>
+<button onclick="location.href='invite.html'">Marriage Invitation 💍</button>
 
-</div>
+<p style="margin-top:15px;">
+Forever grateful, forever in love ❤️
+</p>
 
-<!-- fullscreen -->
-<div id="full" onclick="closeFull()">
-<img id="fullImg">
 </div>
 
 <script>
-
-/* open invitation */
-function openInvite(){
-location.href="invite.html";
-}
-
-/* fullscreen photo */
-function openFull(){
-document.getElementById("fullImg").src=document.getElementById("mainPhoto").src;
-document.getElementById("full").style.display="flex";
-}
-
-function closeFull(){
-document.getElementById("full").style.display="none";
-}
-
-/* music toggle */
-let playing=false;
+let play=false;
 function toggleMusic(){
-let a=document.getElementById("bgm");
-let b=document.getElementById("musicBtn");
-
-if(!playing){
-a.play();
-b.innerHTML="Pause Music ⏸️";
-playing=true;
+if(!play){
+bgm.play();
+musicBtn.innerHTML="Pause ⏸️";
+play=true;
 }else{
-a.pause();
-b.innerHTML="Play Music 🎵";
-playing=false;
+bgm.pause();
+musicBtn.innerHTML="Play Music 🎵";
+play=false;
 }
 }
-
-/* volume */
-function setVol(v){
-document.getElementById("bgm").volume=v;
-}
-
-/* auto photo change */
-let pics=["vmlove1.jpeg","vmlove2.jpeg","vmlove3.jpeg"];
-let i=0;
-setInterval(()=>{
-i=(i+1)%pics.length;
-document.getElementById("mainPhoto").src=pics[i];
-},3000);
-
 </script>
 
 </body>

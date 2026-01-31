@@ -56,6 +56,33 @@ border-radius:10px;
 margin:6px 0;
 font-size:13px;
 }
+
+/* celebration hearts */
+.celebrate{
+position:fixed;
+bottom:0;
+font-size:20px;
+transition:2s;
+}
+
+/* thank you popup */
+#thanks{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.6);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:10;
+}
+
+#thanks div{
+background:white;
+color:black;
+padding:20px;
+border-radius:20px;
+text-align:center;
+}
 </style>
 </head>
 
@@ -72,6 +99,14 @@ font-size:13px;
 
 <div id="messages"></div>
 
+</div>
+
+<!-- thank you popup -->
+<div id="thanks" onclick="this.style.display='none'">
+  <div>
+    <h3>Thank you for your message 💖</h3>
+    <p>With love,<br>Venu ❤️ Madhusri</p>
+  </div>
 </div>
 
 <script type="module">
@@ -95,18 +130,40 @@ const wallRef = ref(db,"wall");
 window.sendMsg = function(){
  let name=document.getElementById("name").value;
  let msg=document.getElementById("msg").value;
- if(name && msg){
-   push(wallRef,{name,msg});
-   document.getElementById("msg").value="";
- }
+
+ if(!name || !msg) return;
+
+ push(wallRef,{name,msg});
+ document.getElementById("msg").value="";
+
+ document.getElementById("thanks").style.display="flex";
+ celebrate();
 }
 
-/* realtime display */
+/* realtime show */
 onChildAdded(wallRef,(snap)=>{
  let d=snap.val();
  document.getElementById("messages").innerHTML+=
  `<div class="msg"><b>${d.name}</b><br>${d.msg}</div>`;
 });
+
+/* heart celebration */
+function celebrate(){
+ for(let i=0;i<20;i++){
+   let h=document.createElement("div");
+   h.className="celebrate";
+   h.innerHTML="💖";
+   h.style.left=Math.random()*100+"%";
+   document.body.appendChild(h);
+
+   setTimeout(()=>{
+     h.style.bottom="100%";
+     h.style.opacity=0;
+   },50);
+
+   setTimeout(()=>h.remove(),2000);
+ }
+}
 </script>
 
 </body>

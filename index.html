@@ -44,18 +44,18 @@ pointer-events:none;
 }
 
 button{
-margin-top:15px;
-padding:10px 30px;
+margin-top:12px;
+padding:10px 25px;
 border:none;
 border-radius:25px;
 background:white;
 color:#ff4f7b;
 cursor:pointer;
-font-size:15px;
+font-size:14px;
 }
 
 footer{
-margin-top:15px;
+margin-top:12px;
 font-size:12px;
 opacity:.8;
 }
@@ -88,7 +88,9 @@ One soul<br>
 Endless love 💕
 </p>
 
-<button onclick="openPhoto()">Click Me</button>
+<button onclick="openPhoto()">Click Me</button><br>
+
+<button onclick="openInvite()">Marriage Invitation</button>
 
 <footer>Made with love 🤍</footer>
 
@@ -97,6 +99,10 @@ Endless love 💕
 <script>
 function openPhoto(){
 window.open("vmlove.jpeg","_blank");
+}
+
+function openInvite(){
+window.location.href="invite.html";
 }
 
 setInterval(()=>{

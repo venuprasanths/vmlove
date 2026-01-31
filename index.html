@@ -16,9 +16,12 @@ overflow:hidden;
 color:white;
 }
 
-/* glowing blobs */
+/* glowing background */
 .bg1,.bg2{
-position:absolute;border-radius:50%;filter:blur(120px);opacity:.5;
+position:absolute;
+border-radius:50%;
+filter:blur(120px);
+opacity:.5;
 }
 .bg1{width:300px;height:300px;background:#ff9acb;top:10%;left:15%;}
 .bg2{width:350px;height:350px;background:#a46bff;bottom:10%;right:15%;}
@@ -39,21 +42,36 @@ from{opacity:0;transform:translateY(20px)}
 to{opacity:1;transform:translateY(0)}
 }
 
-.title{letter-spacing:3px;font-size:22px;opacity:.8;}
-.names{font-size:28px;margin:10px 0 15px;font-weight:600;}
+.title{
+letter-spacing:3px;
+font-size:22px;
+opacity:.8;
+}
+
+.names{
+font-size:28px;
+margin:10px 0 15px;
+font-weight:600;
+}
 
 .photo{
-width:170px;height:170px;border-radius:50%;
-object-fit:cover;border:4px solid white;
+width:170px;
+height:170px;
+border-radius:50%;
+object-fit:cover;
+border:4px solid white;
 box-shadow:0 0 20px rgba(255,255,255,.6);
 transition:opacity 1s;
 pointer-events:none;
 }
 
-.tagline{margin-top:12px;opacity:.85;}
+.tagline{
+margin-top:12px;
+opacity:.85;
+}
 
 button{
-margin-top:18px;
+margin-top:12px;
 padding:10px 30px;
 border-radius:25px;
 border:none;
@@ -63,11 +81,19 @@ font-size:15px;
 cursor:pointer;
 }
 
-footer{margin-top:18px;font-size:13px;opacity:.7;}
-
-.heart{
-position:fixed;bottom:-20px;animation:float 7s linear infinite;
+footer{
+margin-top:18px;
+font-size:13px;
+opacity:.7;
 }
+
+/* floating hearts */
+.heart{
+position:fixed;
+bottom:-20px;
+animation:float 7s linear infinite;
+}
+
 @keyframes float{
 to{transform:translateY(-110vh);opacity:0;}
 }
@@ -77,7 +103,7 @@ to{transform:translateY(-110vh);opacity:0;}
 <body>
 
 <!-- Background music -->
-<audio autoplay loop>
+<audio id="bgm" loop>
 <source src="music.mp3" type="audio/mpeg">
 </audio>
 
@@ -96,7 +122,9 @@ to{transform:translateY(-110vh);opacity:0;}
 Two hearts • One soul • Endless love
 </div>
 
-<button onclick="openInvite()">Marriage Invitation</button>
+<button onclick="playMusic()">Play Music 🎵</button><br>
+
+<button onclick="openInvite()">Marriage Invitation 💍</button>
 
 <footer>Made with love ✨</footer>
 
@@ -105,6 +133,10 @@ Two hearts • One soul • Endless love
 <script>
 function openInvite(){
 window.location.href="invite.html";
+}
+
+function playMusic(){
+document.getElementById("bgm").play();
 }
 
 /* floating hearts */

@@ -1,69 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Love Wall 💌</title>
+<title>Love Wall</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body{
 margin:0;
-font-family:Segoe UI,Arial;
-background:linear-gradient(135deg,#3a002c,#ff6fa3);
-min-height:100vh;
+font-family:Arial;
+background:#ff5b8a;
 color:white;
-padding:10px;
+padding:8px;
 }
 
-h2{
-text-align:center;
-font-size:18px;
-margin:5px 0;
-}
+h3{text-align:center;margin:5px;font-size:16px;}
 
 input,textarea{
 width:100%;
-padding:8px;
-border-radius:8px;
-border:none;
-margin-top:6px;
-font-size:13px;
-}
-
-textarea{height:60px;}
-
-button{
-margin-top:8px;
-width:100%;
-padding:8px;
-border-radius:20px;
-border:none;
-background:#ffd1dc;
-font-size:13px;
-}
-
-.msg{
-background:rgba(255,255,255,.2);
 padding:6px;
-border-radius:10px;
-margin-top:6px;
+margin-top:4px;
+border:none;
+border-radius:6px;
 font-size:12px;
 }
 
-.heart{
-position:fixed;
-bottom:-10px;
-animation:float 6s linear infinite;
+textarea{height:45px;}
+
+button{
+margin-top:6px;
+width:100%;
+padding:6px;
+border-radius:15px;
+border:none;
+background:white;
+color:#ff4f8b;
+font-size:12px;
 }
 
-@keyframes float{
-to{transform:translateY(-110vh);opacity:0;}
+.msg{
+background:rgba(255,255,255,.25);
+padding:5px;
+border-radius:8px;
+margin-top:5px;
+font-size:11px;
+}
+
+#all{
+max-height:55vh;
+overflow-y:auto;
+margin-top:6px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>💌 Love Wall</h2>
+<h3>💌 Love Wall</h3>
 
 <input id="name" placeholder="Name">
 <textarea id="msg" placeholder="Message"></textarea>
@@ -91,26 +83,22 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const wall = ref(db,"wall");
 
+/* SEND */
 window.send=function(){
-if(name.value==""||msg.value=="") return;
+if(name.value==""||msg.value=="") return alert("Fill both");
 push(wall,{name:name.value,msg:msg.value});
 name.value="";
 msg.value="";
 }
 
+/* SHOW */
 onChildAdded(wall,s=>{
 let d=s.val();
-all.innerHTML="<div class='msg'><b>"+d.name+"</b><br>"+d.msg+"</div>"+all.innerHTML;
+let div=document.createElement("div");
+div.className="msg";
+div.innerHTML="<b>"+d.name+"</b><br>"+d.msg;
+all.prepend(div);
 });
-
-setInterval(()=>{
-let h=document.createElement("div");
-h.className="heart";
-h.innerHTML="💖";
-h.style.left=Math.random()*100+"%";
-document.body.appendChild(h);
-setTimeout(()=>h.remove(),6000);
-},800);
 
 </script>
 

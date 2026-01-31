@@ -1,111 +1,119 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Love Wall</title>
+<title>Love Message Wall 💌</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body{
 margin:0;
-font-family:Arial;
-background:linear-gradient(135deg,#3a0028,#ff5b8a);
-color:white;
-display:flex;
-justify-content:center;
-align-items:center;
+font-family:Segoe UI;
+background:linear-gradient(135deg,#3a002c,#ff6fa3);
 min-height:100vh;
+color:white;
+padding:15px;
 }
 
-.box{
-background:rgba(255,255,255,.15);
-padding:20px;
-border-radius:20px;
-width:90%;
-max-width:380px;
-text-align:center;
-}
+h2{text-align:center;}
 
 input,textarea{
 width:100%;
 padding:10px;
-margin-top:8px;
 border-radius:10px;
 border:none;
+margin-top:8px;
 }
 
 button{
 margin-top:10px;
+width:100%;
 padding:10px;
 border-radius:20px;
 border:none;
 background:#ffd1dc;
-width:100%;
+cursor:pointer;
 }
 
 .msg{
-background:white;
-color:black;
-padding:8px;
-border-radius:10px;
-margin-top:8px;
-font-size:13px;
+background:rgba(255,255,255,.2);
+padding:10px;
+border-radius:15px;
+margin-top:10px;
+}
+
+.heart{
+position:fixed;
+bottom:-10px;
+animation:float 6s linear infinite;
+}
+
+@keyframes float{
+to{transform:translateY(-110vh);opacity:0;}
 }
 </style>
 </head>
 
 <body>
 
-<div class="box">
-
 <h2>💌 Love Message Wall</h2>
 
-<input id="name" placeholder="Your Name">
-<textarea id="message" placeholder="Your Love Message"></textarea>
+<input id="name" placeholder="Your name">
+<textarea id="msg" placeholder="Your sweet message"></textarea>
 
-<button onclick="send()">Send Love ❤️</button>
+<button onclick="send()">Send ❤️</button>
 
-<div id="messages"></div>
+<div id="all"></div>
 
-<button onclick="location.href='index.html'">Back 💖</button>
+<script type="module">
 
-</div>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-<script>
-
-/* 🔴 PASTE YOUR FIREBASE CONFIG HERE */
-var firebaseConfig = {
- apiKey: "YOUR_API_KEY",
- authDomain: "YOUR_DOMAIN",
- databaseURL: "YOUR_DB_URL",
- projectId: "YOUR_PROJECT",
- storageBucket: "",
- messagingSenderId: "",
- appId: ""
+const firebaseConfig = {
+apiKey: "AIzaSyAetysNyLP1kFZIWM-IhDtHH_Kq7HoSGxg",
+authDomain: "vmlove-a2df1.firebaseapp.com",
+databaseURL: "https://vmlove-a2df1-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId: "vmlove-a2df1",
+storageBucket: "vmlove-a2df1.firebasestorage.app",
+messagingSenderId: "932908158778",
+appId: "1:932908158778:web:eb8185babb63b8aff80a03"
 };
 
-firebase.initializeApp(firebaseConfig);
+initializeApp(firebaseConfig);
 
-var db=firebase.database().ref("messages");
+const db=getDatabase();
+const wall=ref(db,"wall");
 
-function send(){
-let n=name.value;
-let m=message.value;
-
-if(n==""||m=="")return alert("Fill all");
-
-db.push({name:n,msg:m});
+/* send */
+window.send=function(){
+if(name.value==""||msg.value=="")return alert("Fill both!");
+push(wall,{
+name:name.value,
+msg:msg.value
+});
 name.value="";
-message.value="";
+msg.value="";
 }
 
-/* live messages */
-db.on("child_added",s=>{
-let d=s.val();
-messages.innerHTML="<div class='msg'><b>"+d.name+"</b><br>"+d.msg+"</div>"+messages.innerHTML;
+/* show */
+onValue(wall,s=>{
+all.innerHTML="";
+s.forEach(x=>{
+let d=x.val();
+all.innerHTML=
+"<div class='msg'><b>"+d.name+"</b><br>"+d.msg+"</div>"+all.innerHTML;
 });
+});
+
+/* floating hearts */
+setInterval(()=>{
+let h=document.createElement("div");
+h.className="heart";
+h.innerHTML="💖";
+h.style.left=Math.random()*100+"%";
+document.body.appendChild(h);
+setTimeout(()=>h.remove(),6000);
+},500);
 
 </script>
 

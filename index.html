@@ -16,18 +16,14 @@ overflow:hidden;
 color:white;
 }
 
-/* glowing background circles */
+/* glowing blobs */
 .bg1,.bg2{
-position:absolute;
-border-radius:50%;
-filter:blur(120px);
-opacity:.5;
+position:absolute;border-radius:50%;filter:blur(120px);opacity:.5;
 }
 .bg1{width:300px;height:300px;background:#ff9acb;top:10%;left:15%;}
 .bg2{width:350px;height:350px;background:#a46bff;bottom:10%;right:15%;}
 
 .card{
-position:relative;
 background:rgba(255,255,255,.12);
 padding:45px 40px;
 border-radius:30px;
@@ -35,40 +31,26 @@ width:380px;
 text-align:center;
 backdrop-filter:blur(15px);
 box-shadow:0 25px 60px rgba(0,0,0,.4);
-animation:pop 1.2s ease;
+animation:fadeIn 2s ease;
 }
 
-@keyframes pop{
-from{transform:scale(.8);opacity:0}
-to{transform:scale(1);opacity:1}
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(20px)}
+to{opacity:1;transform:translateY(0)}
 }
 
-.title{
-letter-spacing:3px;
-font-size:22px;
-opacity:.8;
-}
-
-.names{
-font-size:28px;
-margin:10px 0 20px;
-font-weight:600;
-}
+.title{letter-spacing:3px;font-size:22px;opacity:.8;}
+.names{font-size:28px;margin:10px 0 15px;font-weight:600;}
 
 .photo{
-width:160px;
-height:160px;
-border-radius:50%;
-object-fit:cover;
-border:4px solid white;
+width:170px;height:170px;border-radius:50%;
+object-fit:cover;border:4px solid white;
 box-shadow:0 0 20px rgba(255,255,255,.6);
+transition:opacity 1s;
 pointer-events:none;
 }
 
-.tagline{
-margin-top:15px;
-opacity:.85;
-}
+.tagline{margin-top:12px;opacity:.85;}
 
 button{
 margin-top:18px;
@@ -81,19 +63,11 @@ font-size:15px;
 cursor:pointer;
 }
 
-footer{
-margin-top:18px;
-font-size:13px;
-opacity:.7;
-}
+footer{margin-top:18px;font-size:13px;opacity:.7;}
 
-/* floating hearts */
 .heart{
-position:fixed;
-bottom:-20px;
-animation:float 7s linear infinite;
+position:fixed;bottom:-20px;animation:float 7s linear infinite;
 }
-
 @keyframes float{
 to{transform:translateY(-110vh);opacity:0;}
 }
@@ -101,6 +75,11 @@ to{transform:translateY(-110vh);opacity:0;}
 </head>
 
 <body>
+
+<!-- Background music -->
+<audio autoplay loop>
+<source src="music.mp3" type="audio/mpeg">
+</audio>
 
 <div class="bg1"></div>
 <div class="bg2"></div>
@@ -111,7 +90,7 @@ to{transform:translateY(-110vh);opacity:0;}
 
 <div class="names">Venuprasanth ❤️ Madhusri</div>
 
-<img src="vmlove.jpeg" class="photo">
+<img id="slide" src="vmlove1.jpeg" class="photo">
 
 <div class="tagline">
 Two hearts • One soul • Endless love
@@ -137,6 +116,19 @@ h.style.left=Math.random()*100+"%";
 document.body.appendChild(h);
 setTimeout(()=>h.remove(),7000);
 },600);
+
+/* gallery slideshow */
+let pics=["vmlove1.jpeg","vmlove2.jpeg","vmlove3.jpeg"];
+let i=0;
+setInterval(()=>{
+i=(i+1)%pics.length;
+let img=document.getElementById("slide");
+img.style.opacity=0;
+setTimeout(()=>{
+img.src=pics[i];
+img.style.opacity=1;
+},500);
+},3000);
 </script>
 
 </body>

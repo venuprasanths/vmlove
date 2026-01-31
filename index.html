@@ -3,12 +3,14 @@
 <head>
 <title>Venu ❤️ Madhusri</title>
 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 body{
 margin:0;
 font-family:"Segoe UI",Arial;
 background:linear-gradient(135deg,#23001a,#ff4f8b);
-height:100vh;
+min-height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
@@ -18,10 +20,11 @@ color:white;
 
 .card{
 background:rgba(255,255,255,.15);
-padding:40px;
-border-radius:30px;
+padding:25px;
+border-radius:25px;
 text-align:center;
-width:380px;
+width:90%;
+max-width:380px;
 backdrop-filter:blur(12px);
 box-shadow:0 0 30px rgba(255,100,160,.8);
 animation:fade 2s;
@@ -33,75 +36,47 @@ from{opacity:0;transform:scale(.8)}
 to{opacity:1}
 }
 
-.names{font-size:26px;margin-bottom:10px;min-height:30px;}
+.names{font-size:22px;margin-bottom:10px;min-height:26px;}
 
 .photo{
-width:160px;height:160px;border-radius:50%;
+width:140px;height:140px;border-radius:50%;
 border:4px solid white;object-fit:cover;
 box-shadow:0 0 25px rgba(255,255,255,.6);
 transition:opacity 1s;cursor:pointer;
 }
 
-p{font-size:14px;line-height:1.5;opacity:.9;}
+p{font-size:13px;line-height:1.4;opacity:.9;}
 
 button{
-margin-top:10px;padding:10px 25px;border-radius:20px;
-border:none;background:#ffd1dc;cursor:pointer;transition:.3s;
+margin-top:10px;padding:10px 20px;border-radius:20px;
+border:none;background:#ffd1dc;cursor:pointer;transition:.3s;width:100%;
 }
 button:hover{transform:scale(1.05);}
 
-input{width:160px;margin-top:5px;}
+input{width:100%;margin-top:5px;}
 
 .heart{position:fixed;bottom:-20px;animation:float 7s linear infinite;}
 @keyframes float{to{transform:translateY(-110vh);opacity:0;}}
 
 .side-heart{
-position:fixed;top:50%;font-size:40px;animation:beat 1s infinite;z-index:1;
+position:fixed;top:50%;font-size:30px;animation:beat 1s infinite;z-index:1;
 }
-.left-heart{left:20px;}
-.right-heart{right:20px;}
+.left-heart{left:10px;}
+.right-heart{right:10px;}
 @keyframes beat{0%{transform:scale(1);}50%{transform:scale(1.4);}100%{transform:scale(1);}}
 
-/* fullscreen photo */
+/* fullscreen */
 #full{position:fixed;inset:0;background:black;display:none;justify-content:center;align-items:center;z-index:5;}
 #full img{max-width:90%;max-height:90%;}
 
-/* sparkle stars */
-.star{
-position:fixed;
-background:white;
-width:2px;height:2px;
-border-radius:50%;
-animation:twinkle 3s infinite;
-}
-@keyframes twinkle{
-0%,100%{opacity:0;}
-50%{opacity:1;}
-}
-
-/* scroll hint */
-.scroll{
-position:fixed;
-bottom:10px;
-font-size:12px;
-opacity:.7;
-animation:bounce 1.5s infinite;
-}
-@keyframes bounce{
-0%,100%{transform:translateY(0);}
-50%{transform:translateY(-8px);}
-}
-
 /* visitor */
 .visitor{
-position:fixed;
-top:10px;
-right:10px;
-font-size:12px;
-background:rgba(0,0,0,.4);
-padding:5px 10px;
-border-radius:15px;
+position:fixed;top:10px;right:10px;font-size:11px;
+background:rgba(0,0,0,.4);padding:5px 10px;border-radius:15px;
 }
+
+.scroll{display:none;}
+.star{display:none;}
 </style>
 </head>
 
@@ -109,14 +84,10 @@ border-radius:15px;
 
 <div class="visitor" id="visit"></div>
 
-<div class="scroll">⬇ Scroll</div>
-
 <div class="side-heart left-heart">❤️</div>
 <div class="side-heart right-heart">❤️</div>
 
-<audio id="bgm" loop>
-<source src="music.mp3" type="audio/mpeg">
-</audio>
+<audio id="bgm" loop preload="auto"></audio>
 
 <div class="card">
 
@@ -126,8 +97,9 @@ border-radius:15px;
 
 <p>Together is our favorite place to be.<br>Forever & always 💖</p>
 
-<button id="musicBtn" onclick="toggleMusic()">Play Music 🎵</button><br>
-<input type="range" min="0" max="1" step="0.1" onchange="bgm.volume=this.value">
+<button id="musicBtn" onclick="toggleMusic()">Play Music 🎵</button>
+
+<input id="vol" type="range" min="0" max="1" step="0.05">
 
 <br><br>
 
@@ -141,7 +113,7 @@ border-radius:15px;
 
 <script>
 
-/* visitor counter */
+/* visitor */
 let v=localStorage.getItem("vis")||0;
 v++;localStorage.setItem("vis",v);
 visit.innerHTML="Visitors : "+v;
@@ -161,41 +133,37 @@ setTimeout(()=>{slide.src=pics[i];slide.style.opacity=1;},500);
 /* fullscreen */
 function openFull(){fullImg.src=slide.src;full.style.display="flex";}
 
-/* music */
+/* load music */
+bgm.src="music.mp3";
+
+/* music toggle FIX */
 let play=false;
 function toggleMusic(){
-if(!play){bgm.play();musicBtn.innerHTML="Pause ⏸️";play=true;}
-else{bgm.pause();musicBtn.innerHTML="Play Music 🎵";play=false;}
+if(!play){
+bgm.play();
+musicBtn.innerHTML="Pause ⏸️";
+play=true;
+}else{
+bgm.pause();
+musicBtn.innerHTML="Play Music 🎵";
+play=false;
 }
+}
+
+/* volume FIX */
+vol.oninput=function(){
+bgm.volume=this.value;
+};
 
 /* floating hearts */
 setInterval(()=>{
 let h=document.createElement("div");
-h.className="heart";h.innerHTML="❤️";h.style.left=Math.random()*100+"%";
-document.body.appendChild(h);setTimeout(()=>h.remove(),7000);
-},600);
-
-/* sparkle stars */
-for(let s=0;s<60;s++){
-let st=document.createElement("div");
-st.className="star";
-st.style.left=Math.random()*100+"%";
-st.style.top=Math.random()*100+"%";
-document.body.appendChild(st);
-}
-
-/* fireworks on open */
-for(let f=0;f<30;f++){
-setTimeout(()=>{
-let h=document.createElement("div");
-h.innerHTML="✨";
-h.style.position="fixed";
+h.className="heart";
+h.innerHTML="❤️";
 h.style.left=Math.random()*100+"%";
-h.style.top=Math.random()*100+"%";
 document.body.appendChild(h);
-setTimeout(()=>h.remove(),2000);
-},f*100);
-}
+setTimeout(()=>h.remove(),7000);
+},700);
 
 </script>
 

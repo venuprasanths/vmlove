@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Love Wall</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(135deg,#3a0028,#ff5b8a);
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+}
+
+.box{
+background:rgba(255,255,255,.15);
+padding:20px;
+border-radius:20px;
+width:90%;
+max-width:380px;
+text-align:center;
+}
+
+input,textarea{
+width:100%;
+padding:10px;
+margin-top:8px;
+border-radius:10px;
+border:none;
+}
+
+button{
+margin-top:10px;
+padding:10px;
+border-radius:20px;
+border:none;
+background:#ffd1dc;
+width:100%;
+}
+
+.msg{
+background:white;
+color:black;
+padding:8px;
+border-radius:10px;
+margin-top:8px;
+font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>💌 Love Message Wall</h2>
+
+<input id="name" placeholder="Your Name">
+<textarea id="message" placeholder="Your Love Message"></textarea>
+
+<button onclick="send()">Send Love ❤️</button>
+
+<div id="messages"></div>
+
+<button onclick="location.href='index.html'">Back 💖</button>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+
+/* 🔴 PASTE YOUR FIREBASE CONFIG HERE */
+var firebaseConfig = {
+ apiKey: "YOUR_API_KEY",
+ authDomain: "YOUR_DOMAIN",
+ databaseURL: "YOUR_DB_URL",
+ projectId: "YOUR_PROJECT",
+ storageBucket: "",
+ messagingSenderId: "",
+ appId: ""
+};
+
+firebase.initializeApp(firebaseConfig);
+
+var db=firebase.database().ref("messages");
+
+function send(){
+let n=name.value;
+let m=message.value;
+
+if(n==""||m=="")return alert("Fill all");
+
+db.push({name:n,msg:m});
+name.value="";
+message.value="";
+}
+
+/* live messages */
+db.on("child_added",s=>{
+let d=s.val();
+messages.innerHTML="<div class='msg'><b>"+d.name+"</b><br>"+d.msg+"</div>"+messages.innerHTML;
+});
+
+</script>
+
+</body>
+</html>

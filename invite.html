@@ -73,6 +73,16 @@ animation:float 8s linear infinite;
 @keyframes float{
 to{transform:translateY(-110vh);opacity:0;}
 }
+
+/* QR */
+.qr{
+margin-top:10px;
+}
+.qr img{
+width:120px;
+border:2px solid #d4af37;
+border-radius:10px;
+}
 </style>
 </head>
 
@@ -93,7 +103,16 @@ to{transform:translateY(-110vh);opacity:0;}
 <div id="countdown" style="margin-top:8px;"></div>
 
 <button onclick="callNow()">📞 Call</button><br>
-<button onclick="shareWA()">📲 WhatsApp Share</button>
+<button onclick="shareWA()">📲 WhatsApp Share</button><br>
+
+<!-- NEW: Save to Calendar -->
+<button onclick="saveCalendar()">📅 Save to Calendar</button>
+
+<!-- NEW: QR Code for Venue -->
+<div class="qr">
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://maps.google.com/?q=Thottiyam">
+<div style="font-size:12px;color:#444;">Scan for Location</div>
+</div>
 
 <div id="map">
 <iframe
@@ -133,6 +152,15 @@ let x=d-now;
 let days=Math.floor(x/(1000*60*60*24));
 document.getElementById("countdown").innerHTML="⏳ "+days+" days remaining";
 },1000);
+
+/* NEW: save to calendar */
+function saveCalendar(){
+let url="https://www.google.com/calendar/render?action=TEMPLATE"
++"&text=Venuprasanth+%26+Madhusri+Wedding"
++"&dates=20301126T040000Z/20301126T100000Z"
++"&location=Thottiyam";
+window.open(url);
+}
 
 /* rose petals */
 setInterval(()=>{

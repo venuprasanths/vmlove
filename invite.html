@@ -63,23 +63,6 @@ border-radius:10px;
 overflow:hidden;
 }
 
-/* proposal popup */
-.popup{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.6);
-display:none;
-justify-content:center;
-align-items:center;
-}
-.popup div{
-background:white;
-padding:25px;
-border-radius:20px;
-text-align:center;
-width:260px;
-}
-
 /* roses */
 .rose{
 position:fixed;
@@ -104,14 +87,13 @@ to{transform:translateY(-110vh);opacity:0;}
 <div class="info">
 📅 <b>26 / 11 / 2030</b><br>
 📍 <b>Thottiyam</b><br>
-📞 <b>1234567890</b>
+📞 <b>8754997585</b>
 </div>
 
 <div id="countdown" style="margin-top:8px;"></div>
 
 <button onclick="callNow()">📞 Call</button><br>
-<button onclick="shareWA()">📲 WhatsApp Share</button><br>
-<button onclick="showProposal()">💌 Proposal</button>
+<button onclick="shareWA()">📲 WhatsApp Share</button>
 
 <div id="map">
 <iframe
@@ -121,15 +103,6 @@ width="100%" height="140" style="border:0;"></iframe>
 
 <p style="margin-top:12px;color:#444;">With blessings & love 💖</p>
 
-</div>
-
-<!-- Proposal popup -->
-<div class="popup" id="pop">
-<div>
-<h3>Will you marry me? 💍</h3>
-<button onclick="alert('She said YES ❤️')">Yes</button><br><br>
-<button onclick="closePop()">Close</button>
-</div>
 </div>
 
 <script>
@@ -150,14 +123,6 @@ window.open("https://wa.me/?text="+encodeURIComponent(location.href));
 /* call */
 function callNow(){
 location.href="tel:8754997585";
-}
-
-/* proposal */
-function showProposal(){
-document.getElementById("pop").style.display="flex";
-}
-function closePop(){
-document.getElementById("pop").style.display="none";
 }
 
 /* countdown */

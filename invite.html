@@ -3,12 +3,14 @@
 <head>
 <title>Wedding Invitation</title>
 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 body{
 margin:0;
 font-family:"Segoe UI",Arial;
 background:linear-gradient(135deg,#3b0a57,#ffb3c7);
-height:100vh;
+min-height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
@@ -17,50 +19,58 @@ overflow:hidden;
 
 .card{
 background:#fff8f2;
-padding:35px;
-border-radius:30px;
+padding:25px;
+border-radius:25px;
 text-align:center;
-width:400px;
+width:90%;
+max-width:420px;
 box-shadow:0 15px 40px rgba(0,0,0,.35);
 border:3px solid #d4af37;
-position:relative;
 }
 
 .title{
-font-size:26px;
+font-size:22px;
 color:#7a1f5c;
 white-space:nowrap;
 }
 
 .names{
-margin:15px 0;
-font-size:24px;
+margin:12px 0;
+font-size:20px;
 font-weight:600;
 color:#b01257;
-min-height:30px;
+min-height:26px;
 }
 
 .info{
-margin-top:8px;
-line-height:1.7;
-font-size:15px;
+margin-top:6px;
+line-height:1.6;
+font-size:14px;
 color:#333;
 }
 
 button{
 margin-top:10px;
-padding:8px 22px;
-border-radius:20px;
+padding:12px 25px;
+border-radius:25px;
 border:none;
 background:linear-gradient(135deg,#d4af37,#ff9acb);
 color:#3b0030;
 cursor:pointer;
+width:100%;
+font-size:15px;
 }
 
 #map{
 margin-top:10px;
 border-radius:10px;
 overflow:hidden;
+}
+
+.qr img{
+width:120px;
+border:2px solid #d4af37;
+border-radius:10px;
 }
 
 /* roses */
@@ -72,16 +82,6 @@ animation:float 8s linear infinite;
 
 @keyframes float{
 to{transform:translateY(-110vh);opacity:0;}
-}
-
-/* QR */
-.qr{
-margin-top:10px;
-}
-.qr img{
-width:120px;
-border:2px solid #d4af37;
-border-radius:10px;
 }
 </style>
 </head>
@@ -97,19 +97,16 @@ border-radius:10px;
 <div class="info">
 📅 <b>26 / 11 / 2030</b><br>
 📍 <b>Thottiyam</b><br>
-📞 <b>1234567890</b>
+📞 <b>8754997585</b>
 </div>
 
-<div id="countdown" style="margin-top:8px;"></div>
+<div id="countdown" style="margin-top:6px;font-size:13px;"></div>
 
-<button onclick="callNow()">📞 Call</button><br>
-<button onclick="shareWA()">📲 WhatsApp Share</button><br>
-
-<!-- NEW: Save to Calendar -->
+<button onclick="callNow()">📞 Call</button>
+<button onclick="shareWA()">📲 WhatsApp Share</button>
 <button onclick="saveCalendar()">📅 Save to Calendar</button>
 
-<!-- NEW: QR Code for Venue -->
-<div class="qr">
+<div class="qr" style="margin-top:10px;">
 <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://maps.google.com/?q=Thottiyam">
 <div style="font-size:12px;color:#444;">Scan for Location</div>
 </div>
@@ -117,20 +114,20 @@ border-radius:10px;
 <div id="map">
 <iframe
 src="https://maps.google.com/maps?q=Thottiyam&t=&z=13&ie=UTF8&iwloc=&output=embed"
-width="100%" height="140" style="border:0;"></iframe>
+width="100%" height="160" style="border:0;"></iframe>
 </div>
 
-<p style="margin-top:12px;color:#444;">With blessings & love 💖</p>
+<p style="margin-top:10px;color:#444;font-size:13px;">With blessings & love 💖</p>
 
 </div>
 
 <script>
 
-/* typing names */
+/* typing */
 let text="Venuprasanth ❤️ Madhusri",i=0;
 setInterval(()=>{
 if(i<text.length){
-document.getElementById("typing").innerHTML+=text[i++];
+typing.innerHTML+=text[i++];
 }
 },120);
 
@@ -150,10 +147,10 @@ setInterval(()=>{
 let now=new Date().getTime();
 let x=d-now;
 let days=Math.floor(x/(1000*60*60*24));
-document.getElementById("countdown").innerHTML="⏳ "+days+" days remaining";
+countdown.innerHTML="⏳ "+days+" days remaining";
 },1000);
 
-/* NEW: save to calendar */
+/* save calendar */
 function saveCalendar(){
 let url="https://www.google.com/calendar/render?action=TEMPLATE"
 +"&text=Venuprasanth+%26+Madhusri+Wedding"
@@ -170,7 +167,7 @@ r.innerHTML="🌹";
 r.style.left=Math.random()*100+"%";
 document.body.appendChild(r);
 setTimeout(()=>r.remove(),8000);
-},600);
+},700);
 
 </script>
 

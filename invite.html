@@ -6,84 +6,65 @@
 <style>
 body{
 margin:0;
-font-family:'Segoe UI',Arial;
-background:radial-gradient(circle,#fff0f6,#ffd1dc);
+font-family:Georgia,serif;
+background:#f7f2e9;
 height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-overflow:hidden;
 }
 
 .card{
-background:white;
-padding:45px 40px;
-border-radius:30px;
+width:650px;
+height:400px;
+background:#fbf6ee;
+border:2px solid #c9a24d;
+position:relative;
+padding:40px;
 text-align:center;
-width:420px;
-box-shadow:0 20px 50px rgba(0,0,0,.35);
-border:4px solid #f6b26b;
-animation:pop 1.5s ease;
+box-shadow:0 20px 40px rgba(0,0,0,.3);
 }
 
-@keyframes pop{
-from{transform:scale(.8);opacity:0}
-to{transform:scale(1);opacity:1}
+/* Floral corners */
+.corner{
+position:absolute;
+font-size:60px;
 }
+
+.tl{top:10px;left:15px;}
+.tr{top:10px;right:15px;}
+.bl{bottom:10px;left:15px;}
+.br{bottom:10px;right:15px;}
 
 .title{
-font-size:30px;
-color:#d6336c;
-letter-spacing:1px;
-white-space:nowrap;
-}
-
-.subtitle{
-font-size:18px;
-margin-top:8px;
-color:#777;
+font-size:32px;
+letter-spacing:4px;
+margin-top:40px;
 }
 
 .names{
-margin:20px 0;
-font-size:24px;
-font-weight:bold;
-color:#c2185b;
-opacity:0;
-animation:reveal 2s forwards;
-}
-
-@keyframes reveal{
-to{opacity:1;}
+margin:25px 0;
+font-size:28px;
 }
 
 .info{
-margin-top:10px;
-line-height:1.9;
-font-size:16px;
-}
-
-.gold{
-color:#d4af37;
-font-weight:bold;
-}
-
-.flower{
-position:fixed;
-bottom:-30px;
-font-size:22px;
-animation:float 8s linear infinite;
-opacity:.7;
-}
-
-@keyframes float{
-to{transform:translateY(-110vh) rotate(360deg);opacity:0;}
+margin-top:15px;
+line-height:1.8;
+font-size:17px;
 }
 
 .footer{
-margin-top:18px;
-font-size:14px;
-color:#444;
+margin-top:20px;
+font-size:15px;
+}
+
+button{
+margin-top:15px;
+padding:8px 25px;
+border-radius:20px;
+border:1px solid #c9a24d;
+background:white;
+cursor:pointer;
 }
 </style>
 </head>
@@ -92,35 +73,28 @@ color:#444;
 
 <div class="card">
 
-<div class="title">🌸 Grand Wedding Invitation 🌸</div>
-<div class="subtitle">With divine blessings</div>
+<div class="corner tl">🌹</div>
+<div class="corner tr">🌸</div>
+<div class="corner bl">🌷</div>
+<div class="corner br">🌹</div>
+
+<div class="title">WEDDING INVITATION</div>
 
 <div class="names">
-Venuprasanth ❤️ Madhusri
+Venuprasanth <br>&<br> Madhusri
 </div>
 
 <div class="info">
-📅 <span class="gold">26 November 2030</span><br>
-📍 <span class="gold">Thottiyam</span><br>
-📞 <span class="gold">8754997585</span>
+📅 26 / 11 / 2030<br>
+📍 Thottiyam<br>
+📞 8754997585
 </div>
 
 <div class="footer">
-Together forever 💍✨
+With blessings & love 💍
 </div>
 
 </div>
-
-<script>
-setInterval(()=>{
-let f=document.createElement("div");
-f.className="flower";
-f.innerHTML="🌸";
-f.style.left=Math.random()*100+"%";
-document.body.appendChild(f);
-setTimeout(()=>f.remove(),8000);
-},700);
-</script>
 
 </body>
 </html>

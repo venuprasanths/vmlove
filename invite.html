@@ -17,62 +17,78 @@ overflow:hidden;
 
 .card{
 background:#fff8f2;
-padding:40px;
+padding:35px;
 border-radius:30px;
 text-align:center;
 width:400px;
 box-shadow:0 15px 40px rgba(0,0,0,.35);
 border:3px solid #d4af37;
+position:relative;
 }
 
 .title{
-font-size:28px;
+font-size:26px;
 color:#7a1f5c;
 white-space:nowrap;
 }
 
 .names{
-margin:18px 0;
+margin:15px 0;
 font-size:24px;
 font-weight:600;
 color:#b01257;
-white-space:nowrap;
-opacity:0;
-animation:reveal 2s forwards;
-}
-
-@keyframes reveal{
-to{opacity:1;}
+min-height:30px;
 }
 
 .info{
-margin-top:10px;
-line-height:1.8;
-font-size:16px;
+margin-top:8px;
+line-height:1.7;
+font-size:15px;
 color:#333;
 }
 
 button{
-margin-top:12px;
-padding:10px 25px;
-border-radius:25px;
+margin-top:10px;
+padding:8px 22px;
+border-radius:20px;
 border:none;
 background:linear-gradient(135deg,#d4af37,#ff9acb);
 color:#3b0030;
-font-size:14px;
 cursor:pointer;
 }
 
-.flower{
+#map{
+margin-top:10px;
+border-radius:10px;
+overflow:hidden;
+}
+
+/* proposal popup */
+.popup{
 position:fixed;
-bottom:-25px;
-font-size:22px;
+inset:0;
+background:rgba(0,0,0,.6);
+display:none;
+justify-content:center;
+align-items:center;
+}
+.popup div{
+background:white;
+padding:25px;
+border-radius:20px;
+text-align:center;
+width:260px;
+}
+
+/* roses */
+.rose{
+position:fixed;
+bottom:-20px;
 animation:float 8s linear infinite;
-opacity:.7;
 }
 
 @keyframes float{
-to{transform:translateY(-110vh) rotate(360deg);opacity:0;}
+to{transform:translateY(-110vh);opacity:0;}
 }
 </style>
 </head>
@@ -83,44 +99,86 @@ to{transform:translateY(-110vh) rotate(360deg);opacity:0;}
 
 <div class="title">🌸 Marriage Invitation 🌸</div>
 
-<div class="names">
-Venuprasanth ❤️ Madhusri
-</div>
+<div id="typing" class="names"></div>
 
 <div class="info">
 📅 <b>26 / 11 / 2030</b><br>
 📍 <b>Thottiyam</b><br>
-📞 <b>1234567890</b>
+📞 <b>8754997585</b>
 </div>
 
-<!-- Call Button -->
+<div id="countdown" style="margin-top:8px;"></div>
+
 <button onclick="callNow()">📞 Call</button><br>
+<button onclick="shareWA()">📲 WhatsApp Share</button><br>
+<button onclick="showProposal()">💌 Proposal</button>
 
-<!-- Google Map Button -->
-<button onclick="openMap()">📍 Open Location</button>
+<div id="map">
+<iframe
+src="https://maps.google.com/maps?q=Thottiyam&t=&z=13&ie=UTF8&iwloc=&output=embed"
+width="100%" height="140" style="border:0;"></iframe>
+</div>
 
-<p style="margin-top:18px;color:#444;">With blessings & love 💖</p>
+<p style="margin-top:12px;color:#444;">With blessings & love 💖</p>
 
+</div>
+
+<!-- Proposal popup -->
+<div class="popup" id="pop">
+<div>
+<h3>Will you marry me? 💍</h3>
+<button onclick="alert('She said YES ❤️')">Yes</button><br><br>
+<button onclick="closePop()">Close</button>
+</div>
 </div>
 
 <script>
-function callNow(){
-window.location.href="tel:8754997585";
-}
 
-function openMap(){
-window.open("https://maps.google.com/?q=Thottiyam","_blank");
-}
-
-/* floating flowers */
+/* typing names */
+let text="Venuprasanth ❤️ Madhusri",i=0;
 setInterval(()=>{
-let f=document.createElement("div");
-f.className="flower";
-f.innerHTML="🌸";
-f.style.left=Math.random()*100+"%";
-document.body.appendChild(f);
-setTimeout(()=>f.remove(),8000);
-},700);
+if(i<text.length){
+document.getElementById("typing").innerHTML+=text[i++];
+}
+},120);
+
+/* whatsapp */
+function shareWA(){
+window.open("https://wa.me/?text="+encodeURIComponent(location.href));
+}
+
+/* call */
+function callNow(){
+location.href="tel:8754997585";
+}
+
+/* proposal */
+function showProposal(){
+document.getElementById("pop").style.display="flex";
+}
+function closePop(){
+document.getElementById("pop").style.display="none";
+}
+
+/* countdown */
+let d=new Date("Nov 26, 2030").getTime();
+setInterval(()=>{
+let now=new Date().getTime();
+let x=d-now;
+let days=Math.floor(x/(1000*60*60*24));
+document.getElementById("countdown").innerHTML="⏳ "+days+" days remaining";
+},1000);
+
+/* rose petals */
+setInterval(()=>{
+let r=document.createElement("div");
+r.className="rose";
+r.innerHTML="🌹";
+r.style.left=Math.random()*100+"%";
+document.body.appendChild(r);
+setTimeout(()=>r.remove(),8000);
+},600);
+
 </script>
 
 </body>

@@ -16,7 +16,6 @@ overflow:hidden;
 color:white;
 }
 
-/* glowing background */
 .bg1,.bg2{
 position:absolute;
 border-radius:50%;
@@ -42,17 +41,8 @@ from{opacity:0;transform:translateY(20px)}
 to{opacity:1;transform:translateY(0)}
 }
 
-.title{
-letter-spacing:3px;
-font-size:22px;
-opacity:.8;
-}
-
-.names{
-font-size:28px;
-margin:10px 0 15px;
-font-weight:600;
-}
+.title{letter-spacing:3px;font-size:22px;opacity:.8;}
+.names{font-size:28px;margin:10px 0 15px;font-weight:600;}
 
 .photo{
 width:170px;
@@ -65,10 +55,7 @@ transition:opacity 1s;
 pointer-events:none;
 }
 
-.tagline{
-margin-top:12px;
-opacity:.85;
-}
+.tagline{margin-top:12px;opacity:.85;}
 
 button{
 margin-top:12px;
@@ -81,13 +68,8 @@ font-size:15px;
 cursor:pointer;
 }
 
-footer{
-margin-top:18px;
-font-size:13px;
-opacity:.7;
-}
+footer{margin-top:18px;font-size:13px;opacity:.7;}
 
-/* floating hearts */
 .heart{
 position:fixed;
 bottom:-20px;
@@ -102,7 +84,6 @@ to{transform:translateY(-110vh);opacity:0;}
 
 <body>
 
-<!-- Background music -->
 <audio id="bgm" loop>
 <source src="music.mp3" type="audio/mpeg">
 </audio>
@@ -122,7 +103,7 @@ to{transform:translateY(-110vh);opacity:0;}
 Two hearts • One soul • Endless love
 </div>
 
-<button onclick="playMusic()">Play Music 🎵</button><br>
+<button id="musicBtn" onclick="toggleMusic()">Play Music 🎵</button><br>
 
 <button onclick="openInvite()">Marriage Invitation 💍</button>
 
@@ -135,8 +116,21 @@ function openInvite(){
 window.location.href="invite.html";
 }
 
-function playMusic(){
-document.getElementById("bgm").play();
+/* music toggle */
+let playing=false;
+function toggleMusic(){
+let audio=document.getElementById("bgm");
+let btn=document.getElementById("musicBtn");
+
+if(!playing){
+audio.play();
+btn.innerHTML="Pause Music ⏸️";
+playing=true;
+}else{
+audio.pause();
+btn.innerHTML="Play Music 🎵";
+playing=false;
+}
 }
 
 /* floating hearts */

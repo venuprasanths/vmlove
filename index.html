@@ -1,36 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Venuprasanth ❤️ Madhusri</title>
+<title>Venu ❤️ Madhusri</title>
 
 <style>
 body{
 margin:0;
-font-family:Arial;
-background:linear-gradient(135deg,#ff5f8a,#ff9ab5);
+font-family:Georgia,serif;
+background:#f7f2e9;
 height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-overflow:hidden;
-color:white;
 }
 
 .card{
-background:rgba(255,255,255,.2);
+width:600px;
+background:#fbf6ee;
+border:2px solid #c9a24d;
 padding:40px;
-border-radius:25px;
 text-align:center;
-width:350px;
-box-shadow:0 15px 40px rgba(0,0,0,.3);
-backdrop-filter:blur(10px);
+position:relative;
+box-shadow:0 20px 40px rgba(0,0,0,.3);
 }
 
-h1{margin:0;}
+/* floral */
+.corner{
+position:absolute;
+font-size:45px;
+}
+.tl{top:10px;left:15px;}
+.tr{top:10px;right:15px;}
+.bl{bottom:10px;left:15px;}
+.br{bottom:10px;right:15px;}
+
+.title{
+letter-spacing:3px;
+font-size:30px;
+}
 
 .names{
-margin:10px 0;
-font-size:22px;
+margin:15px 0;
+font-size:26px;
 }
 
 .photo{
@@ -38,36 +49,21 @@ width:150px;
 height:150px;
 border-radius:50%;
 object-fit:cover;
-margin:15px 0;
-border:4px solid white;
-pointer-events:none;
+border:4px solid #c9a24d;
 }
 
 button{
-margin-top:12px;
-padding:10px 25px;
-border:none;
-border-radius:25px;
+margin-top:15px;
+padding:8px 25px;
+border-radius:20px;
+border:1px solid #c9a24d;
 background:white;
-color:#ff4f7b;
 cursor:pointer;
+}
+
+.footer{
+margin-top:15px;
 font-size:14px;
-}
-
-footer{
-margin-top:12px;
-font-size:12px;
-opacity:.8;
-}
-
-.floating{
-position:fixed;
-bottom:-20px;
-animation:float 6s linear infinite;
-}
-
-@keyframes float{
-to{transform:translateY(-110vh);opacity:0;}
 }
 </style>
 </head>
@@ -76,43 +72,31 @@ to{transform:translateY(-110vh);opacity:0;}
 
 <div class="card">
 
-<h1>Forever Love</h1>
+<div class="corner tl">🌹</div>
+<div class="corner tr">🌸</div>
+<div class="corner bl">🌷</div>
+<div class="corner br">🌹</div>
 
-<div class="names">Venuprasanth ❤️ Madhusri</div>
+<div class="title">FOREVER LOVE</div>
+
+<div class="names">Venuprasanth & Madhusri</div>
 
 <img src="vmlove.jpeg" class="photo">
 
-<p>
-Two hearts<br>
-One soul<br>
-Endless love 💕
-</p>
-
-<button onclick="openPhoto()">Click Me</button><br>
+<br>
 
 <button onclick="openInvite()">Marriage Invitation</button>
 
-<footer>Made with love 🤍</footer>
+<div class="footer">
+Together forever 💍
+</div>
 
 </div>
 
 <script>
-function openPhoto(){
-window.open("vmlove.jpeg","_blank");
-}
-
 function openInvite(){
 window.location.href="invite.html";
 }
-
-setInterval(()=>{
-let h=document.createElement("div");
-h.className="floating";
-h.innerHTML="❤️";
-h.style.left=Math.random()*100+"%";
-document.body.appendChild(h);
-setTimeout(()=>h.remove(),6000);
-},500);
 </script>
 
 </body>

@@ -7,11 +7,12 @@
 body{
 margin:0;
 font-family:"Segoe UI",Arial;
-background:linear-gradient(135deg,#4b0035,#ff5b8a);
+background:linear-gradient(135deg,#23001a,#ff4f8b);
 height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
+overflow:hidden;
 color:white;
 }
 
@@ -22,19 +23,35 @@ border-radius:30px;
 text-align:center;
 width:380px;
 backdrop-filter:blur(12px);
-box-shadow:0 25px 60px rgba(0,0,0,.4);
+box-shadow:0 0 30px rgba(255,100,160,.8);
+animation:fade 2s;
 }
 
-h2{margin:0;}
-p{font-size:14px;line-height:1.6;opacity:.9;}
+@keyframes fade{
+from{opacity:0;transform:scale(.8)}
+to{opacity:1}
+}
+
+.names{
+font-size:26px;
+margin-bottom:10px;
+min-height:30px;
+}
 
 .photo{
-width:150px;
-height:150px;
+width:160px;
+height:160px;
 border-radius:50%;
 border:4px solid white;
 object-fit:cover;
-margin:12px 0;
+box-shadow:0 0 20px pink;
+transition:opacity 1s;
+}
+
+p{
+font-size:14px;
+line-height:1.5;
+opacity:.9;
 }
 
 button{
@@ -47,6 +64,16 @@ cursor:pointer;
 }
 
 input{width:160px;}
+
+.heart{
+position:fixed;
+bottom:-20px;
+animation:float 7s linear infinite;
+}
+
+@keyframes float{
+to{transform:translateY(-110vh);opacity:0;}
+}
 </style>
 </head>
 
@@ -58,19 +85,13 @@ input{width:160px;}
 
 <div class="card">
 
-<h2>Venuprasanth ❤️ Madhusri</h2>
+<div id="typing" class="names"></div>
+
+<img id="slide" src="vmlove1.jpeg" class="photo">
 
 <p>
-Two hearts met, one beautiful journey began.  
-Every smile, every moment, every dream –  
-we walk together hand in hand.
-</p>
-
-<img src="vmlove1.jpeg" class="photo">
-
-<p>
-You are my today, my tomorrow and my forever.  
-Together we create memories that last a lifetime.
+Two hearts met, one beautiful journey began.<br>
+Forever together in love ❤️
 </p>
 
 <button id="musicBtn" onclick="toggleMusic()">Play Music 🎵</button><br>
@@ -81,13 +102,32 @@ Together we create memories that last a lifetime.
 
 <button onclick="location.href='invite.html'">Marriage Invitation 💍</button>
 
-<p style="margin-top:15px;">
-Forever grateful, forever in love ❤️
-</p>
-
 </div>
 
 <script>
+
+/* typing effect */
+let text="Venuprasanth ❤️ Madhusri",t=0;
+setInterval(()=>{
+if(t<text.length){
+document.getElementById("typing").innerHTML+=text[t++];
+}
+},120);
+
+/* slideshow */
+let pics=["vmlove1.jpeg","vmlove2.jpeg","vmlove3.jpeg"];
+let i=0;
+setInterval(()=>{
+i=(i+1)%pics.length;
+let img=document.getElementById("slide");
+img.style.opacity=0;
+setTimeout(()=>{
+img.src=pics[i];
+img.style.opacity=1;
+},500);
+},3000);
+
+/* music */
 let play=false;
 function toggleMusic(){
 if(!play){
@@ -100,6 +140,17 @@ musicBtn.innerHTML="Play Music 🎵";
 play=false;
 }
 }
+
+/* floating hearts */
+setInterval(()=>{
+let h=document.createElement("div");
+h.className="heart";
+h.innerHTML="❤️";
+h.style.left=Math.random()*100+"%";
+document.body.appendChild(h);
+setTimeout(()=>h.remove(),7000);
+},600);
+
 </script>
 
 </body>

@@ -49,9 +49,8 @@ p{font-size:13px;line-height:1.4;opacity:.9;}
 
 button{
 margin-top:10px;padding:10px 20px;border-radius:20px;
-border:none;background:#ffd1dc;cursor:pointer;transition:.3s;width:100%;
+border:none;background:#ffd1dc;cursor:pointer;width:100%;
 }
-button:hover{transform:scale(1.05);}
 
 input{width:100%;margin-top:5px;}
 
@@ -59,24 +58,19 @@ input{width:100%;margin-top:5px;}
 @keyframes float{to{transform:translateY(-110vh);opacity:0;}}
 
 .side-heart{
-position:fixed;top:50%;font-size:30px;animation:beat 1s infinite;z-index:1;
+position:fixed;top:50%;font-size:30px;animation:beat 1s infinite;
 }
 .left-heart{left:10px;}
 .right-heart{right:10px;}
 @keyframes beat{0%{transform:scale(1);}50%{transform:scale(1.4);}100%{transform:scale(1);}}
 
-/* fullscreen */
 #full{position:fixed;inset:0;background:black;display:none;justify-content:center;align-items:center;z-index:5;}
 #full img{max-width:90%;max-height:90%;}
 
-/* visitor */
 .visitor{
 position:fixed;top:10px;right:10px;font-size:11px;
 background:rgba(0,0,0,.4);padding:5px 10px;border-radius:15px;
 }
-
-.scroll{display:none;}
-.star{display:none;}
 </style>
 </head>
 
@@ -101,15 +95,10 @@ background:rgba(0,0,0,.4);padding:5px 10px;border-radius:15px;
 
 <input id="vol" type="range" min="0" max="1" step="0.05">
 
-<br><br>
+<br>
 
 <button onclick="location.href='invite.html'">Marriage Invitation 💍</button>
-<button onclick="location.href='game.html'">Play Love Game 🎮</button>
-<button onclick="location.href='heartgame.html'">Play Heart Game 🎮</button>
 <button onclick="location.href='wall.html'">Love Wall 💌</button>
-
-
-
 
 </div>
 
@@ -129,39 +118,25 @@ let text="Venuprasanth ❤️ Madhusri",t=0;
 setInterval(()=>{if(t<text.length){typing.innerHTML+=text[t++];}},120);
 
 /* slideshow */
-let pics=["vmlove1.jpeg","vmlove2.jpeg","vmlove3.jpeg","vmlove4.jpeg"],i=0;
+let pics=["vmlove1.jpeg","vmlove2.jpeg","vmlove3.jpeg"],i=0;
 setInterval(()=>{
 i=(i+1)%pics.length;
 slide.style.opacity=0;
 setTimeout(()=>{slide.src=pics[i];slide.style.opacity=1;},500);
 },3000);
 
-/* fullscreen */
 function openFull(){fullImg.src=slide.src;full.style.display="flex";}
 
-/* load music */
+/* music */
 bgm.src="music.mp3";
-
-/* music toggle FIX */
 let play=false;
 function toggleMusic(){
-if(!play){
-bgm.play();
-musicBtn.innerHTML="Pause ⏸️";
-play=true;
-}else{
-bgm.pause();
-musicBtn.innerHTML="Play Music 🎵";
-play=false;
+if(!play){bgm.play();musicBtn.innerHTML="Pause ⏸️";play=true;}
+else{bgm.pause();musicBtn.innerHTML="Play Music 🎵";play=false;}
 }
-}
+vol.oninput=function(){bgm.volume=this.value;}
 
-/* volume FIX */
-vol.oninput=function(){
-bgm.volume=this.value;
-};
-
-/* floating hearts */
+/* hearts */
 setInterval(()=>{
 let h=document.createElement("div");
 h.className="heart";
@@ -170,6 +145,26 @@ h.style.left=Math.random()*100+"%";
 document.body.appendChild(h);
 setTimeout(()=>h.remove(),7000);
 },700);
+
+</script>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyAetysNyLP1kFZIWM-IhDtHH_Kq7HoSGxg",
+authDomain: "vmlove-a2df1.firebaseapp.com",
+databaseURL: "https://vmlove-a2df1-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId: "vmlove-a2df1",
+storageBucket: "vmlove-a2df1.firebasestorage.app",
+messagingSenderId: "932908158778",
+appId: "1:932908158778:web:eb8185babb63b8aff80a03"
+};
+
+initializeApp(firebaseConfig);
+getDatabase();
 
 </script>
 

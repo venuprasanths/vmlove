@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Love Message Wall 💌</title>
+<title>Love Wall 💌</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -11,35 +11,42 @@ font-family:Segoe UI,Arial;
 background:linear-gradient(135deg,#3a002c,#ff6fa3);
 min-height:100vh;
 color:white;
-padding:15px;
+padding:10px;
 }
 
-h2{text-align:center;}
+h2{
+text-align:center;
+font-size:18px;
+margin:5px 0;
+}
 
 input,textarea{
 width:100%;
-padding:10px;
-border-radius:10px;
+padding:8px;
+border-radius:8px;
 border:none;
-margin-top:8px;
+margin-top:6px;
+font-size:13px;
 }
 
+textarea{height:60px;}
+
 button{
-margin-top:10px;
+margin-top:8px;
 width:100%;
-padding:10px;
+padding:8px;
 border-radius:20px;
 border:none;
 background:#ffd1dc;
-cursor:pointer;
+font-size:13px;
 }
 
 .msg{
-background:rgba(255,255,255,.25);
-padding:10px;
-border-radius:15px;
-margin-top:10px;
-font-size:14px;
+background:rgba(255,255,255,.2);
+padding:6px;
+border-radius:10px;
+margin-top:6px;
+font-size:12px;
 }
 
 .heart{
@@ -56,10 +63,10 @@ to{transform:translateY(-110vh);opacity:0;}
 
 <body>
 
-<h2>💌 Love Message Wall</h2>
+<h2>💌 Love Wall</h2>
 
-<input id="name" placeholder="Your name">
-<textarea id="msg" placeholder="Your sweet message"></textarea>
+<input id="name" placeholder="Name">
+<textarea id="msg" placeholder="Message"></textarea>
 
 <button onclick="send()">Send ❤️</button>
 
@@ -84,31 +91,18 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const wall = ref(db,"wall");
 
-/* SEND MESSAGE */
-window.send = function(){
-if(name.value=="" || msg.value==""){
-alert("Name + Message fill pannunga");
-return;
-}
-
-push(wall,{
-name:name.value,
-msg:msg.value
-});
-
+window.send=function(){
+if(name.value==""||msg.value=="") return;
+push(wall,{name:name.value,msg:msg.value});
 name.value="";
 msg.value="";
 }
 
-/* SHOW LIVE MESSAGES */
-onChildAdded(wall,(snap)=>{
-let d = snap.val();
-all.innerHTML =
-"<div class='msg'><b>"+d.name+
-"</b><br>"+d.msg+"</div>" + all.innerHTML;
+onChildAdded(wall,s=>{
+let d=s.val();
+all.innerHTML="<div class='msg'><b>"+d.name+"</b><br>"+d.msg+"</div>"+all.innerHTML;
 });
 
-/* floating hearts */
 setInterval(()=>{
 let h=document.createElement("div");
 h.className="heart";
@@ -116,7 +110,7 @@ h.innerHTML="💖";
 h.style.left=Math.random()*100+"%";
 document.body.appendChild(h);
 setTimeout(()=>h.remove(),6000);
-},600);
+},800);
 
 </script>
 

@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html>
 <head>
 <title>Venuprasanth ❤️ Madhusri</title>
@@ -28,27 +28,30 @@ backdrop-filter:blur(10px);
 
 h1{margin:0;}
 
-.names{margin:10px 0;font-size:22px;}
-
-.heart{
-font-size:80px;
-animation:beat 1s infinite;
+.names{
+margin:10px 0;
+font-size:22px;
 }
 
-@keyframes beat{
-0%{transform:scale(1)}
-50%{transform:scale(1.3)}
-100%{transform:scale(1)}
+.photo{
+width:150px;
+height:150px;
+border-radius:50%;
+object-fit:cover;
+margin:15px 0;
+border:4px solid white;
+pointer-events:none;
 }
 
 button{
-margin-top:20px;
+margin-top:15px;
 padding:10px 30px;
 border:none;
 border-radius:25px;
 background:white;
 color:#ff4f7b;
 cursor:pointer;
+font-size:15px;
 }
 
 footer{
@@ -72,22 +75,28 @@ to{transform:translateY(-110vh);opacity:0;}
 <body>
 
 <div class="card">
+
 <h1>Forever Love</h1>
 
 <div class="names">Venuprasanth ❤️ Madhusri</div>
 
-<div class="heart">❤️</div>
+<img src="vmlove.jpeg" class="photo">
 
-<p>Two hearts<br>One soul<br>Endless love 💕</p>
+<p>
+Two hearts<br>
+One soul<br>
+Endless love 💕
+</p>
 
-<button onclick="msg()">Click Me</button>
+<button onclick="openPhoto()">Click Me</button>
 
 <footer>Made with love 🤍</footer>
+
 </div>
 
 <script>
-function msg(){
-alert("Venuprasanth loves Madhusri forever ❤️");
+function openPhoto(){
+window.open("vmlove.jpeg","_blank");
 }
 
 setInterval(()=>{

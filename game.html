@@ -18,14 +18,11 @@ align-items:center;
 
 h2{margin:10px;}
 
-.top{text-align:center}
-
 .grid{
 display:grid;
 grid-template-columns:repeat(4,1fr);
 gap:10px;
 width:260px;
-margin-top:10px;
 }
 
 .card{
@@ -37,7 +34,6 @@ align-items:center;
 justify-content:center;
 font-size:28px;
 cursor:pointer;
-transition:.4s;
 }
 
 .card.flip{background:white;}
@@ -49,25 +45,33 @@ border:none;
 margin:5px;
 }
 
-.heart{
-position:fixed;
-bottom:0;
-animation:fly 2s linear;
-}
-
-@keyframes fly{
-to{transform:translateY(-100vh);opacity:0;}
-}
-
-#board{
-margin-top:10px;
+#leader{
 background:rgba(255,255,255,.2);
-padding:10px 15px;
+padding:10px;
 border-radius:15px;
 width:260px;
+margin-top:10px;
+font-size:13px;
 }
 
-.scoreRow{font-size:13px;margin:3px 0;}
+#timeout{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.7);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:10;
+}
+
+#timeout div{
+background:white;
+color:black;
+padding:25px;
+border-radius:20px;
+text-align:center;
+}
+
 </style>
 </head>
 
@@ -75,23 +79,26 @@ width:260px;
 
 <h2>❤️ Memory Love Game PRO</h2>
 
-<div class="top">
 Player: <span id="user"></span><br>
-Time: <span id="time">60</span>s |
-Moves: <span id="moves">0</span><br>
+⏱ <span id="time">60</span>s | Moves: <span id="moves">0</span><br>
 Score: <span id="score">0</span><br>
+
 <button onclick="restart()">Restart</button>
-</div>
 
 <div class="grid" id="grid"></div>
 
-<div id="board">
+<div id="leader">
 <b>🏆 Leaderboard</b>
-<div id="leaders"></div>
+<div id="list"></div>
 </div>
 
-<audio id="flip" src="https://assets.mixkit.co/sfx/preview/mixkit-click-error-1110.mp3"></audio>
-<audio id="match" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3"></audio>
+<div id="timeout">
+<div>
+<h3>⏰ Time Out</h3>
+<p>Your Score: <span id="final"></span></p>
+<button onclick="restart()">Play Again</button>
+</div>
+</div>
 
 <script type="module">
 
@@ -113,59 +120,60 @@ const db=getDatabase(app);
 const scoreRef=ref(db,"scores");
 
 if(!localStorage.user){
-localStorage.user=prompt("Enter your name / number");
+localStorage.user=prompt("Enter name / number");
 }
 user.innerHTML=localStorage.user;
 
 /* cards */
-const icons=["❤️","💖","💕","😍","😘","💘"];
+const icons=["❤️","💖","😍","😘","💕","💘"];
 let cards=[...icons,...icons].sort(()=>Math.random()-.5);
 
-let first=null,lock=false;
+let first=null;
+let lock=false;
 let matched=0;
-let movesCount=0;
+let moveCount=0;
+let scoreVal=0;
 let timeLeft=60;
-let finalScore=0;
 
-/* timer */
-setInterval(()=>{
-if(timeLeft>0){
-timeLeft--;
-time.innerHTML=timeLeft;
-}else{
-gameOver();
-}
-},1000);
-
+/* draw */
 function draw(){
 grid.innerHTML="";
-cards.forEach((v,i)=>{
-let d=document.createElement("div");
-d.className="card";
-d.onclick=()=>flipCard(d,v);
-grid.appendChild(d);
+cards.forEach(v=>{
+let c=document.createElement("div");
+c.className="card";
+c.onclick=()=>flip(c,v);
+grid.appendChild(c);
 });
 }
 draw();
 
-function flipCard(el,val){
+/* timer */
+let timer=setInterval(()=>{
+if(timeLeft>0){
+timeLeft--;
+time.innerHTML=timeLeft;
+}else{
+clearInterval(timer);
+endGame();
+}
+},1000);
+
+function flip(el,val){
 if(lock||el.classList.contains("flip")||timeLeft<=0)return;
-flip.play();
+
 el.classList.add("flip");
 el.innerHTML=val;
 
 if(!first){first={el,val};return;}
 
-movesCount++;
-moves.innerHTML=movesCount;
+moveCount++;
+moves.innerHTML=moveCount;
 
 if(first.val==val){
-match.play();
 matched++;
-burst();
 first=null;
 calcScore();
-if(matched==6)gameOver();
+if(matched==6)endGame();
 }else{
 lock=true;
 setTimeout(()=>{
@@ -180,48 +188,38 @@ lock=false;
 }
 
 function calcScore(){
-finalScore = matched*20 + timeLeft*2 - movesCount;
-if(finalScore<0)finalScore=0;
-score.innerHTML=finalScore;
+scoreVal=matched*25 + timeLeft*2 - moveCount;
+if(scoreVal<0)scoreVal=0;
+score.innerHTML=scoreVal;
 }
 
-function gameOver(){
+function endGame(){
 calcScore();
 saveScore();
-alert("Game Over! Score: "+finalScore);
+final.innerHTML=scoreVal;
+timeout.style.display="flex";
 }
 
-function burst(){
-for(let i=0;i<10;i++){
-let h=document.createElement("div");
-h.className="heart";
-h.innerHTML="💖";
-h.style.left=Math.random()*100+"%";
-document.body.appendChild(h);
-setTimeout(()=>h.remove(),2000);
-}
-}
-
-function restart(){location.reload();}
-
-/* save single score */
+/* save single */
 function saveScore(){
 set(ref(db,"scores/"+localStorage.user),{
 name:localStorage.user,
-score:finalScore
+score:scoreVal
 });
 }
 
 /* leaderboard */
-onValue(scoreRef,snap=>{
+onValue(scoreRef,s=>{
 let arr=[];
-snap.forEach(x=>arr.push(x.val()));
+s.forEach(x=>arr.push(x.val()));
 arr.sort((a,b)=>b.score-a.score);
-leaders.innerHTML="";
-arr.slice(0,5).forEach(p=>{
-leaders.innerHTML+=`<div class="scoreRow">${p.name} : ${p.score}</div>`;
+list.innerHTML="";
+arr.forEach(p=>{
+list.innerHTML+=`${p.name} : ${p.score}<br>`;
 });
 });
+
+function restart(){location.reload();}
 
 </script>
 

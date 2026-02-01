@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Love Memory Game ❤️</title>
+<title>Love Memory Game Pro ❤️</title>
 
 <style>
 body{
@@ -16,65 +16,56 @@ align-items:center;
 color:white;
 }
 
-h2{margin-top:10px}
-
 .grid{
 display:grid;
-grid-template-columns:repeat(4,70px);
-gap:10px;
-margin-top:15px;
+grid-template-columns:repeat(4,65px);
+gap:8px;
+margin-top:10px;
 }
 
 .card{
-width:70px;height:90px;
+width:65px;height:80px;
 background:#ffd1dc;
 border-radius:10px;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:30px;
+font-size:28px;
 cursor:pointer;
 }
 
-.hidden{background:#fff;}
-
-#score,#best{margin-top:6px}
+.hidden{background:white;}
 
 button{
-margin-top:10px;
-padding:8px 20px;
+padding:8px 18px;
 border-radius:20px;
 border:none;
 background:#ffd1dc;
+margin-top:6px;
 }
+
+#leader{font-size:12px;margin-top:10px}
 
 .heart{
 position:fixed;
-font-size:20px;
 animation:fly 2s linear;
 }
 
 @keyframes fly{
 to{transform:translateY(-200px);opacity:0;}
 }
-
-#leader{
-margin-top:10px;
-font-size:12px;
-max-width:220px;
-}
 </style>
 </head>
 
 <body>
 
-<h2>❤️ Love Memory Game</h2>
+<h3>❤️ Memory Love Game PRO</h3>
 
-<div id="player"></div>
-<div id="score">Score: 0</div>
-<div id="best"></div>
+<div id="user"></div>
+<div id="time"></div>
+<div id="score"></div>
 
-<button onclick="restart()">Restart 🔄</button>
+<button onclick="restart()">Restart</button>
 
 <div class="grid" id="grid"></div>
 
@@ -82,28 +73,41 @@ max-width:220px;
 
 <audio id="match" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3b1a0efdf3.mp3"></audio>
 
-<script>
+<script type="module">
 
-if(!localStorage.getItem("user")){
-location.href="login.html";
-}
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 
-player.innerHTML="Player: "+localStorage.getItem("user");
+const firebaseConfig={
+apiKey:"AIzaSyAetysNyLP1kFZIWM-IhDtHH_Kq7HoSGxg",
+authDomain:"vmlove-a2df1.firebaseapp.com",
+databaseURL:"https://vmlove-a2df1-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId:"vmlove-a2df1"
+};
 
-const emojis=["💖","💍","🌹","😘","❤️","😍"];
-let cards=[];
-let first=null,lock=false,score=0;
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+const scoreRef=ref(db,"scores");
+
+if(!localStorage.user) location.href="login.html";
+
+user.innerHTML="Player: "+localStorage.user;
+
+const icons=["💖","💍","🌹","😘","❤️","😍","💕","💋"]; // HARD LEVEL
+
+let cards=[...icons,...icons].sort(()=>0.5-Math.random());
+let first=null,lock=false,points=0,time=60;
 
 function start(){
 grid.innerHTML="";
-cards=[...emojis,...emojis].sort(()=>0.5-Math.random());
-score=0;
-scoreDiv();
+cards.sort(()=>0.5-Math.random());
+points=0;time=60;
+update();
 
-cards.forEach(e=>{
+cards.forEach(v=>{
 let d=document.createElement("div");
 d.className="card hidden";
-d.dataset.val=e;
+d.dataset.val=v;
 d.onclick=()=>flip(d);
 grid.appendChild(d);
 });
@@ -111,7 +115,21 @@ grid.appendChild(d);
 
 start();
 
-/* flip */
+/* TIMER */
+setInterval(()=>{
+time--;
+timeDiv();
+if(time<=0){
+alert("⏰ Time up!");
+saveScore();
+restart();
+}
+},1000);
+
+function timeDiv(){time.innerHTML="Time: "+time;}
+function update(){score.innerHTML="Score: "+points;timeDiv();}
+
+/* FLIP */
 function flip(c){
 if(lock||!c.classList.contains("hidden"))return;
 
@@ -121,12 +139,11 @@ c.innerHTML=c.dataset.val;
 if(!first){first=c;return;}
 
 if(first.dataset.val==c.dataset.val){
-score++;
+points++;
 match.play();
-saveBest();
 burst();
 first=null;
-scoreDiv();
+update();
 }else{
 lock=true;
 setTimeout(()=>{
@@ -136,18 +153,16 @@ first.classList.add("hidden");
 c.classList.add("hidden");
 first=null;
 lock=false;
-},700);
+},600);
 }
 }
 
-/* score */
-function scoreDiv(){
-score.innerHTML="Score: "+score;
-}
+/* restart */
+window.restart=()=>start();
 
 /* hearts */
 function burst(){
-for(let i=0;i<10;i++){
+for(let i=0;i<8;i++){
 let h=document.createElement("div");
 h.className="heart";
 h.innerHTML="💖";
@@ -158,35 +173,23 @@ setTimeout(()=>h.remove(),2000);
 }
 }
 
-/* restart */
-function restart(){
-start();
+/* SAVE ONLINE SCORE */
+function saveScore(){
+push(scoreRef,{
+name:localStorage.user,
+score:points
+});
 }
 
-/* best score */
-function saveBest(){
-let b=localStorage.getItem("best")||0;
-if(score>b){
-localStorage.setItem("best",score);
-}
-best.innerHTML="Best: "+localStorage.getItem("best");
-}
-
-/* leaderboard */
-function updateLeader(){
-let arr=JSON.parse(localStorage.getItem("leader")||"[]");
-arr.push({n:localStorage.getItem("user"),s:score});
-arr.sort((a,b)=>b.s-a.s);
+/* ONLINE LEADERBOARD */
+onValue(scoreRef,snap=>{
+let arr=[];
+snap.forEach(x=>arr.push(x.val()));
+arr.sort((a,b)=>b.score-a.score);
 arr=arr.slice(0,5);
-localStorage.setItem("leader",JSON.stringify(arr));
-
-leader.innerHTML="<b>🏆 Leaderboard</b><br>"+arr.map(x=>x.n+" : "+x.s).join("<br>");
-}
-
-window.onbeforeunload=updateLeader;
-
-best.innerHTML="Best: "+(localStorage.getItem("best")||0);
-updateLeader();
+leader.innerHTML="<b>🏆 Online Leaderboard</b><br>"+
+arr.map(x=>x.name+" : "+x.score).join("<br>");
+});
 
 </script>
 

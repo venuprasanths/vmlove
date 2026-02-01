@@ -2,14 +2,14 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Login – Love Game</title>
+<title>Love Game Login</title>
 
 <style>
 body{
 margin:0;
-font-family:Segoe UI,Arial;
+font-family:Segoe UI;
 background:linear-gradient(135deg,#ff4f8b,#3b0030);
-min-height:100vh;
+height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
@@ -21,24 +21,19 @@ background:rgba(255,255,255,.2);
 padding:20px;
 border-radius:20px;
 width:90%;
-max-width:350px;
+max-width:320px;
 text-align:center;
 }
 
-input{
+input,button{
 width:100%;
 padding:10px;
-border-radius:10px;
-border:none;
 margin-top:10px;
+border-radius:12px;
+border:none;
 }
 
 button{
-margin-top:12px;
-width:100%;
-padding:10px;
-border-radius:15px;
-border:none;
 background:#ffd1dc;
 cursor:pointer;
 }
@@ -49,57 +44,28 @@ cursor:pointer;
 
 <div class="box">
 
-<h3>📱 Login with OTP</h3>
+<h3>❤️ Enter Your Mobile</h3>
 
-<input id="phone" placeholder="+91XXXXXXXXXX">
+<input id="phone" placeholder="Enter mobile number">
 
-<div id="recaptcha-container"></div>
-
-<button onclick="sendOTP()">Send OTP</button>
-
-<input id="otp" placeholder="Enter OTP">
-
-<button onclick="verifyOTP()">Verify & Play 🎮</button>
+<button onclick="login()">Continue 🎮</button>
 
 </div>
 
-<!-- Firebase v9 compat -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
 <script>
-const firebaseConfig = {
- apiKey:"AIzaSyAetysNyLP1kFZIWM-IhDtHH_Kq7HoSGxg",
- authDomain:"vmlove-a2df1.firebaseapp.com"
-};
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-
-window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-  'size': 'normal'
-});
-
-function sendOTP(){
-let number=document.getElementById("phone").value;
-auth.signInWithPhoneNumber(number,window.recaptchaVerifier)
-.then(function(confirmationResult){
-window.confirmationResult=confirmationResult;
-alert("OTP Sent ✅");
-}).catch(function(error){
-alert(error.message);
-});
+if(localStorage.getItem("user")){
+location.href="game.html";
 }
 
-function verifyOTP(){
-let code=document.getElementById("otp").value;
-confirmationResult.confirm(code).then(function(result){
-localStorage.setItem("userPhone",result.user.phoneNumber);
-location.href="game.html";   // next page
-}).catch(function(){
-alert("Wrong OTP");
-});
+function login(){
+let p=document.getElementById("phone").value;
+if(p.length<10)return alert("Enter valid number");
+
+localStorage.setItem("user",p);
+location.href="game.html";
 }
+
 </script>
 
 </body>

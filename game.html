@@ -38,7 +38,15 @@ cursor:pointer;
 
 .hidden{background:#fff;}
 
-#score{margin-top:10px}
+#score,#best{margin-top:6px}
+
+button{
+margin-top:10px;
+padding:8px 20px;
+border-radius:20px;
+border:none;
+background:#ffd1dc;
+}
 
 .heart{
 position:fixed;
@@ -49,6 +57,12 @@ animation:fly 2s linear;
 @keyframes fly{
 to{transform:translateY(-200px);opacity:0;}
 }
+
+#leader{
+margin-top:10px;
+font-size:12px;
+max-width:220px;
+}
 </style>
 </head>
 
@@ -58,8 +72,15 @@ to{transform:translateY(-200px);opacity:0;}
 
 <div id="player"></div>
 <div id="score">Score: 0</div>
+<div id="best"></div>
+
+<button onclick="restart()">Restart 🔄</button>
 
 <div class="grid" id="grid"></div>
+
+<div id="leader"></div>
+
+<audio id="match" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3b1a0efdf3.mp3"></audio>
 
 <script>
 
@@ -70,18 +91,27 @@ location.href="login.html";
 player.innerHTML="Player: "+localStorage.getItem("user");
 
 const emojis=["💖","💍","🌹","😘","❤️","😍"];
-let cards=[...emojis,...emojis].sort(()=>0.5-Math.random());
-
+let cards=[];
 let first=null,lock=false,score=0;
 
-cards.forEach((e,i)=>{
+function start(){
+grid.innerHTML="";
+cards=[...emojis,...emojis].sort(()=>0.5-Math.random());
+score=0;
+scoreDiv();
+
+cards.forEach(e=>{
 let d=document.createElement("div");
 d.className="card hidden";
 d.dataset.val=e;
 d.onclick=()=>flip(d);
 grid.appendChild(d);
 });
+}
 
+start();
+
+/* flip */
 function flip(c){
 if(lock||!c.classList.contains("hidden"))return;
 
@@ -92,9 +122,11 @@ if(!first){first=c;return;}
 
 if(first.dataset.val==c.dataset.val){
 score++;
-scoreDiv();
+match.play();
+saveBest();
 burst();
 first=null;
+scoreDiv();
 }else{
 lock=true;
 setTimeout(()=>{
@@ -108,10 +140,12 @@ lock=false;
 }
 }
 
+/* score */
 function scoreDiv(){
-document.getElementById("score").innerHTML="Score: "+score;
+score.innerHTML="Score: "+score;
 }
 
+/* hearts */
 function burst(){
 for(let i=0;i<10;i++){
 let h=document.createElement("div");
@@ -123,6 +157,36 @@ document.body.appendChild(h);
 setTimeout(()=>h.remove(),2000);
 }
 }
+
+/* restart */
+function restart(){
+start();
+}
+
+/* best score */
+function saveBest(){
+let b=localStorage.getItem("best")||0;
+if(score>b){
+localStorage.setItem("best",score);
+}
+best.innerHTML="Best: "+localStorage.getItem("best");
+}
+
+/* leaderboard */
+function updateLeader(){
+let arr=JSON.parse(localStorage.getItem("leader")||"[]");
+arr.push({n:localStorage.getItem("user"),s:score});
+arr.sort((a,b)=>b.s-a.s);
+arr=arr.slice(0,5);
+localStorage.setItem("leader",JSON.stringify(arr));
+
+leader.innerHTML="<b>🏆 Leaderboard</b><br>"+arr.map(x=>x.n+" : "+x.s).join("<br>");
+}
+
+window.onbeforeunload=updateLeader;
+
+best.innerHTML="Best: "+(localStorage.getItem("best")||0);
+updateLeader();
 
 </script>
 

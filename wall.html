@@ -1,116 +1,155 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Love Wall</title>
+<title>Love Message Wall 💌</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body{
 margin:0;
-background:#ff4f8b;
-font-family:Arial;
-display:flex;
-justify-content:center;
-align-items:center;
+font-family:Segoe UI,Arial;
+background:linear-gradient(135deg,#ff4f8b,#3b0030);
 min-height:100vh;
+color:white;
+padding:15px;
 }
 
-.box{
-background:white;
+h2{text-align:center;}
+
+.card{
+background:rgba(255,255,255,.2);
 padding:15px;
-border-radius:15px;
-width:90%;
-max-width:380px;
+border-radius:20px;
+max-width:400px;
+margin:auto;
 }
 
 input,textarea{
 width:100%;
 padding:8px;
-margin-top:6px;
 border-radius:10px;
-border:1px solid #ccc;
+border:none;
+margin-top:8px;
 }
 
 button{
+margin-top:10px;
 width:100%;
-margin-top:8px;
 padding:10px;
+border-radius:15px;
 border:none;
-background:pink;
-border-radius:12px;
+background:#ffd1dc;
+cursor:pointer;
 }
 
 .msg{
-background:#ffe6f0;
-padding:6px;
-margin-top:6px;
+background:white;
+color:black;
+padding:8px;
 border-radius:10px;
+margin:6px 0;
 font-size:13px;
 }
 
-.del{float:right;color:red;cursor:pointer}
+.time{font-size:10px;color:gray;}
+
+.del{
+float:right;
+color:red;
+cursor:pointer;
+}
+
+#thanks{
+position:fixed;inset:0;background:rgba(0,0,0,.6);
+display:none;justify-content:center;align-items:center;
+}
+#thanks div{
+background:white;color:black;padding:20px;border-radius:20px;text-align:center;
+}
 </style>
 </head>
 
 <body>
 
-<div class="box">
-<h3>💌 Love Wall</h3>
+<h2>💌 Love Wall</h2>
 
-<input id="name" placeholder="Your name">
-<textarea id="msg" placeholder="Your message"></textarea>
-<button onclick="send()">Send ❤️</button>
+<div class="card">
+
+<input id="uname" placeholder="Your name">
+<textarea id="umsg" placeholder="Write message"></textarea>
+
+<button onclick="sendMsg()">Send ❤️</button>
 
 <input id="pin" placeholder="Admin PIN (1234)">
 
-<div id="list"></div>
+<div id="messages"></div>
+
 </div>
 
-<!-- Firebase v8 -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<div id="thanks" onclick="this.style.display='none'">
+<div>
+<h3>Thank you for your message 💖</h3>
+</div>
+</div>
 
-<script>
-firebase.initializeApp({
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+
+const firebaseConfig={
 apiKey:"AIzaSyAetysNyLP1kFZIWM-IhDtHH_Kq7HoSGxg",
-databaseURL:"https://vmlove-a2df1-default-rtdb.asia-southeast1.firebasedatabase.app"
-});
+authDomain:"vmlove-a2df1.firebaseapp.com",
+databaseURL:"https://vmlove-a2df1-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId:"vmlove-a2df1",
+storageBucket:"vmlove-a2df1.firebasestorage.app",
+messagingSenderId:"932908158778",
+appId:"1:932908158778:web:eb8185babb63b8aff80a03"
+};
 
-var db=firebase.database().ref("wall");
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+const wallRef=ref(db,"wall");
 
-function send(){
-let n=name.value;
-let m=msg.value;
+window.sendMsg=function(){
+let n=document.getElementById("uname").value.trim();
+let m=document.getElementById("umsg").value.trim();
+if(!n||!m)return alert("Fill both");
 
-if(!n||!m){alert("Fill both");return;}
-
-db.push({
+push(wallRef,{
 name:n,
 msg:m,
 time:new Date().toLocaleString()
 });
 
-msg.value="";
-alert("Thank you ❤️");
+document.getElementById("umsg").value="";
+thanks.style.display="flex";
 }
 
-db.on("child_added",snap=>{
-let d=snap.val();
-let id=snap.key;
+onChildAdded(wallRef,(s)=>{
+let d=s.val();
+let id=s.key;
 
-let del="";
-if(pin.value=="1234"){
-del=`<span class='del' onclick="delMsg('${id}')">Delete</span>`;
-}
-
-list.innerHTML=
-`<div class='msg'>${del}<b>${d.name}</b><br>${d.msg}<br><small>${d.time}</small></div>`+list.innerHTML;
+messages.innerHTML=
+`<div class="msg" id="${id}">
+<b>${d.name}</b>
+<span class="del" onclick="delMsg('${id}')">🗑</span><br>
+${d.msg}<br>
+<span class="time">${d.time}</span>
+</div>`+messages.innerHTML;
 });
 
-function delMsg(id){
-firebase.database().ref("wall/"+id).remove();
-location.reload();
+window.delMsg=function(id){
+if(pin.value=="1234"){
+remove(ref(db,"wall/"+id));
+document.getElementById(id).remove();
+}else alert("Admin only");
 }
+
+umsg.addEventListener("keydown",e=>{
+if(e.key=="Enter")sendMsg();
+});
+
 </script>
 
 </body>

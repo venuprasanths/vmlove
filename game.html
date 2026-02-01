@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+<title>Memory Love Game PRO</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Love Memory Game Pro ❤️</title>
 
 <style>
 body{
@@ -10,21 +10,24 @@ margin:0;
 font-family:Segoe UI;
 background:linear-gradient(135deg,#ff4f8b,#3b0030);
 min-height:100vh;
+color:white;
 display:flex;
 flex-direction:column;
 align-items:center;
-color:white;
 }
+
+h2{margin:10px;}
 
 .grid{
 display:grid;
-grid-template-columns:repeat(4,65px);
-gap:8px;
-margin-top:10px;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+width:260px;
+margin-top:15px;
 }
 
 .card{
-width:65px;height:80px;
+width:60px;height:70px;
 background:#ffd1dc;
 border-radius:10px;
 display:flex;
@@ -32,163 +35,169 @@ align-items:center;
 justify-content:center;
 font-size:28px;
 cursor:pointer;
+transform-style:preserve-3d;
+transition:.4s;
 }
 
-.hidden{background:white;}
+.card.flip{background:white;transform:rotateY(180deg);}
+
+.top{
+text-align:center;
+}
 
 button{
-padding:8px 18px;
-border-radius:20px;
+padding:8px 20px;
+border-radius:15px;
 border:none;
-background:#ffd1dc;
-margin-top:6px;
+margin:5px;
 }
-
-#leader{font-size:12px;margin-top:10px}
 
 .heart{
 position:fixed;
+bottom:0;
 animation:fly 2s linear;
 }
 
 @keyframes fly{
-to{transform:translateY(-200px);opacity:0;}
+to{transform:translateY(-100vh);opacity:0;}
+}
+
+#board{
+margin-top:10px;
+background:rgba(255,255,255,.2);
+padding:10px 15px;
+border-radius:15px;
+width:260px;
+}
+
+.scoreRow{
+font-size:13px;
+margin:3px 0;
 }
 </style>
 </head>
 
 <body>
 
-<h3>❤️ Memory Love Game PRO</h3>
+<h2>❤️ Memory Love Game PRO</h2>
 
-<div id="user"></div>
-<div id="time"></div>
-<div id="score"></div>
-
+<div class="top">
+Player: <span id="user"></span><br>
+Score: <span id="score">0</span><br>
 <button onclick="restart()">Restart</button>
+</div>
 
 <div class="grid" id="grid"></div>
 
-<div id="leader"></div>
+<div id="board">
+<b>🏆 Leaderboard</b>
+<div id="leaders"></div>
+</div>
 
-<audio id="match" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3b1a0efdf3.mp3"></audio>
+<audio id="flip" src="https://assets.mixkit.co/sfx/preview/mixkit-click-error-1110.mp3"></audio>
+<audio id="match" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3"></audio>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 
 const firebaseConfig={
 apiKey:"AIzaSyAetysNyLP1kFZIWM-IhDtHH_Kq7HoSGxg",
 authDomain:"vmlove-a2df1.firebaseapp.com",
 databaseURL:"https://vmlove-a2df1-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId:"vmlove-a2df1"
+projectId:"vmlove-a2df1",
+storageBucket:"vmlove-a2df1.firebasestorage.app",
+messagingSenderId:"932908158778",
+appId:"1:932908158778:web:eb8185babb63b8aff80a03"
 };
 
 const app=initializeApp(firebaseConfig);
 const db=getDatabase(app);
 const scoreRef=ref(db,"scores");
 
-if(!localStorage.user) location.href="login.html";
+if(!localStorage.user){
+localStorage.user=prompt("Enter your name / number");
+}
 
-user.innerHTML="Player: "+localStorage.user;
+user.innerHTML=localStorage.user;
 
-const icons=["💖","💍","🌹","😘","❤️","😍","💕","💋"]; // HARD LEVEL
+const icons=["❤️","💖","💕","😍","😘","💘"];
+let cards=[...icons,...icons].sort(()=>Math.random()-.5);
 
-let cards=[...icons,...icons].sort(()=>0.5-Math.random());
-let first=null,lock=false,points=0,time=60;
+let first=null,lock=false,points=0;
 
-function start(){
+function draw(){
 grid.innerHTML="";
-cards.sort(()=>0.5-Math.random());
-points=0;time=60;
-update();
-
-cards.forEach(v=>{
+cards.forEach((v,i)=>{
 let d=document.createElement("div");
-d.className="card hidden";
-d.dataset.val=v;
-d.onclick=()=>flip(d);
+d.className="card";
+d.dataset.i=i;
+d.onclick=()=>flipCard(d,v);
 grid.appendChild(d);
 });
 }
+draw();
 
-start();
+function flipCard(el,val){
+if(lock||el.classList.contains("flip"))return;
+flip.play();
+el.classList.add("flip");
+el.innerHTML=val;
 
-/* TIMER */
-setInterval(()=>{
-time--;
-timeDiv();
-if(time<=0){
-alert("⏰ Time up!");
-saveScore();
-restart();
-}
-},1000);
+if(!first){first={el,val};return;}
 
-function timeDiv(){time.innerHTML="Time: "+time;}
-function update(){score.innerHTML="Score: "+points;timeDiv();}
-
-/* FLIP */
-function flip(c){
-if(lock||!c.classList.contains("hidden"))return;
-
-c.classList.remove("hidden");
-c.innerHTML=c.dataset.val;
-
-if(!first){first=c;return;}
-
-if(first.dataset.val==c.dataset.val){
-points++;
+if(first.val==val){
 match.play();
+points+=10;
+score.innerHTML=points;
 burst();
 first=null;
-update();
+saveScore();
 }else{
 lock=true;
 setTimeout(()=>{
-first.innerHTML="";
-c.innerHTML="";
-first.classList.add("hidden");
-c.classList.add("hidden");
+el.classList.remove("flip");
+first.el.classList.remove("flip");
+el.innerHTML="";
+first.el.innerHTML="";
 first=null;
 lock=false;
-},600);
+},700);
 }
 }
 
-/* restart */
-window.restart=()=>start();
-
-/* hearts */
 function burst(){
-for(let i=0;i<8;i++){
+for(let i=0;i<10;i++){
 let h=document.createElement("div");
 h.className="heart";
 h.innerHTML="💖";
 h.style.left=Math.random()*100+"%";
-h.style.bottom="0";
 document.body.appendChild(h);
 setTimeout(()=>h.remove(),2000);
 }
 }
 
-/* SAVE ONLINE SCORE */
+function restart(){
+location.reload();
+}
+
 function saveScore(){
-push(scoreRef,{
+set(ref(db,"scores/"+localStorage.user),{
 name:localStorage.user,
 score:points
 });
 }
 
-/* ONLINE LEADERBOARD */
+/* leaderboard */
 onValue(scoreRef,snap=>{
 let arr=[];
 snap.forEach(x=>arr.push(x.val()));
 arr.sort((a,b)=>b.score-a.score);
-arr=arr.slice(0,5);
-leader.innerHTML="<b>🏆 Online Leaderboard</b><br>"+
-arr.map(x=>x.name+" : "+x.score).join("<br>");
+leaders.innerHTML="";
+arr.slice(0,5).forEach(p=>{
+leaders.innerHTML+=`<div class="scoreRow">${p.name} : ${p.score}</div>`;
+});
 });
 
 </script>

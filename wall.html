@@ -74,11 +74,13 @@ margin-right:8px;
 }
 
 /* celebration */
-.confetti{position:fixed;top:-10px;font-size:22px;animation:fall 2s linear forwards;}
+.confetti{
+position:fixed;
+top:-10px;
+font-size:22px;
+animation:fall 2s linear forwards;
+}
 @keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:0;}}
-
-.burst{position:fixed;font-size:25px;animation:burst 1.2s ease-out forwards;}
-@keyframes burst{0%{transform:scale(0);}60%{transform:scale(1.5);}100%{transform:scale(0);opacity:0;}}
 
 </style>
 </head>
@@ -104,7 +106,7 @@ margin-right:8px;
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, remove, update } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 
 const firebaseConfig={
 apiKey:"AIzaSyAetysNyLP1kFZIWM-IhDtHH_Kq7HoSGxg",
@@ -120,6 +122,7 @@ const app=initializeApp(firebaseConfig);
 const db=getDatabase(app);
 const wallRef=ref(db,"wall");
 
+/* send */
 window.sendMsg=function(){
 let n=uname.value.trim();
 let m=umsg.value.trim();
@@ -137,11 +140,15 @@ likes:0
 };
 if(pic.files[0]) reader.readAsDataURL(pic.files[0]);
 else reader.onload();
+
 umsg.value="";
 celebrate();
 }
 
-onChildAdded(wallRef,(s)=>{
+/* realtime show */
+onValue(wallRef,(snap)=>{
+messages.innerHTML="";
+snap.forEach(s=>{
 let d=s.val();
 let id=s.key;
 
@@ -160,6 +167,7 @@ ${d.msg}<br>
 
 </div>`+messages.innerHTML;
 });
+});
 
 /* like */
 window.likeMsg=function(id,c){
@@ -171,15 +179,14 @@ window.waShare=function(n,m){
 window.open("https://wa.me/?text="+encodeURIComponent(n+": "+m));
 }
 
-/* delete */
+/* delete admin */
 window.delMsg=function(id){
 if(pin.value=="1234"){
 remove(ref(db,"wall/"+id));
-document.getElementById(id).remove();
 }else alert("Admin only");
 }
 
-/* effects */
+/* celebration */
 function celebrate(){
 for(let i=0;i<25;i++){
  let c=document.createElement("div");

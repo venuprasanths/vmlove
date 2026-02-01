@@ -1,86 +1,77 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Love Message Wall 💌</title>
+<title>Love Wall</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body{
 margin:0;
-font-family:Segoe UI,Arial;
+font-family:Arial;
 background:linear-gradient(135deg,#ff4f8b,#3b0030);
 min-height:100vh;
 color:white;
-padding:15px;
+padding:10px;
 }
 
-h2{text-align:center;}
+h3{text-align:center;}
 
 .card{
 background:rgba(255,255,255,.2);
-padding:15px;
-border-radius:20px;
-max-width:400px;
+padding:12px;
+border-radius:15px;
+max-width:380px;
 margin:auto;
 }
 
 input,textarea{
 width:100%;
-padding:8px;
-border-radius:10px;
+padding:6px;
 border:none;
-margin-top:8px;
+border-radius:6px;
+margin-top:6px;
+font-size:12px;
 }
+
+textarea{height:50px;}
 
 button{
-margin-top:10px;
+margin-top:6px;
 width:100%;
-padding:10px;
-border-radius:15px;
+padding:8px;
 border:none;
-background:#ffd1dc;
-cursor:pointer;
-}
-
-#messages{
-margin-top:15px;
-max-height:300px;
-overflow:auto;
+border-radius:15px;
+background:white;
+color:#ff4f8b;
+font-size:12px;
 }
 
 .msg{
 background:white;
 color:black;
-padding:8px;
-border-radius:10px;
-margin:6px 0;
-font-size:13px;
+padding:6px;
+border-radius:8px;
+margin-top:6px;
+font-size:11px;
 position:relative;
 }
 
 .time{
-font-size:10px;
+font-size:9px;
 opacity:.6;
 position:absolute;
-top:6px;
-right:8px;
+top:4px;
+right:6px;
 }
 
 .del{
-position:absolute;
-bottom:6px;
-right:8px;
-font-size:11px;
+font-size:10px;
 color:red;
+position:absolute;
+bottom:4px;
+right:6px;
 display:none;
 cursor:pointer;
-}
-
-.celebrate{
-position:fixed;
-bottom:0;
-font-size:20px;
-transition:2s;
 }
 
 #thanks{
@@ -90,44 +81,42 @@ background:rgba(0,0,0,.6);
 display:none;
 justify-content:center;
 align-items:center;
-z-index:10;
 }
 
 #thanks div{
 background:white;
 color:black;
-padding:20px;
-border-radius:20px;
-text-align:center;
+padding:15px;
+border-radius:15px;
 }
+
+#messages{max-height:50vh;overflow:auto;margin-top:6px;}
 </style>
 </head>
 
 <body>
 
-<h2>💌 Love Message Wall</h2>
+<h3>💌 Love Wall</h3>
 
 <div class="card">
 
-<input id="name" placeholder="Your name">
-<textarea id="msg" placeholder="Write your message..."></textarea>
+<input id="name" placeholder="Name">
+<textarea id="msg" placeholder="Message"></textarea>
 
-<button onclick="sendMsg()">Send ❤️</button>
+<button id="sendBtn">Send ❤️</button>
 
-<input id="admin" placeholder="Admin PIN (only you)" type="password">
+<input id="admin" placeholder="Admin PIN" type="password">
 
 <div id="messages"></div>
 
 </div>
 
-<div id="thanks" onclick="this.style.display='none'">
-<div>
-<h3>Thank you for your message 💖</h3>
-<p>With love,<br>Venu ❤️ Madhusri</p>
-</div>
+<div id="thanks">
+<div>Thank you for your message 💖</div>
 </div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 
@@ -143,61 +132,62 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const wallRef = ref(db,"wall");
+const wall = ref(db,"wall");
 
-const ADMIN="1430";   // 🔐 change PIN here
+const ADMIN="1430";
 
-window.sendMsg=function(){
- let n=name.value;
- let m=msg.value;
- if(!n||!m)return;
+/* SEND */
+document.getElementById("sendBtn").addEventListener("click",()=>{
 
- push(wallRef,{
- name:n,
- msg:m,
- time:new Date().toLocaleString()
- });
+let n=name.value.trim();
+let m=msg.value.trim();
+if(!n||!m)return;
 
- msg.value="";
- thanks.style.display="flex";
- celebrate();
-}
-
-onChildAdded(wallRef,(snap)=>{
- let d=snap.val();
- let id=snap.key;
-
- let div=document.createElement("div");
- div.className="msg";
- div.innerHTML=`<b>${d.name}</b><br>${d.msg}
- <div class="time">${d.time}</div>
- <div class="del" onclick="del('${id}')">Delete</div>`;
-
- messages.appendChild(div);
-
- if(admin.value==ADMIN){
- div.querySelector(".del").style.display="block";
- }
+push(wall,{
+name:n,
+msg:m,
+time:new Date().toLocaleString()
 });
 
-window.del=function(id){
- if(admin.value==ADMIN){
+msg.value="";
+thanks.style.display="flex";
+setTimeout(()=>thanks.style.display="none",1500);
+});
+
+/* SHOW LIVE */
+onChildAdded(wall,(s)=>{
+let d=s.val();
+let id=s.key;
+
+let div=document.createElement("div");
+div.className="msg";
+div.innerHTML=`<b>${d.name}</b><br>${d.msg}
+<div class="time">${d.time}</div>
+<div class="del">Delete</div>`;
+
+div.querySelector(".del").onclick=()=>{
+ if(admin.value===ADMIN){
  remove(ref(db,"wall/"+id));
- location.reload();
+ div.remove();
  }
+};
+
+messages.prepend(div);
+
+/* admin show delete */
+if(admin.value===ADMIN){
+div.querySelector(".del").style.display="block";
 }
 
-function celebrate(){
- for(let i=0;i<15;i++){
- let h=document.createElement("div");
- h.className="celebrate";
- h.innerHTML="💖";
- h.style.left=Math.random()*100+"%";
- document.body.appendChild(h);
- setTimeout(()=>{h.style.bottom="100%";h.style.opacity=0;},50);
- setTimeout(()=>h.remove(),2000);
- }
-}
+});
+
+/* show delete when PIN typed */
+admin.oninput=function(){
+document.querySelectorAll(".del").forEach(x=>{
+x.style.display = admin.value===ADMIN ? "block":"none";
+});
+};
+
 </script>
 
 </body>

@@ -142,7 +142,7 @@ location.href="tel:8754997585";
 }
 
 /* countdown */
-let d=new Date("Nov 26, 2030").getTime();
+let d=new Date("Nov 07, 2030").getTime();
 setInterval(()=>{
 let now=new Date().getTime();
 let x=d-now;
@@ -153,8 +153,8 @@ countdown.innerHTML="⏳ "+days+" days remaining";
 /* save calendar */
 function saveCalendar(){
 let url="https://www.google.com/calendar/render?action=TEMPLATE"
-+"&text=Venuprasanth+%26+Madhusri+Wedding"
-+"&dates=20301126T040000Z/20301126T100000Z"
++"&text=Venuprasanth+%07+Madhusri+Wedding"
++"&dates=20301107T040000Z/20301107T100000Z"
 +"&location=Thottiyam";
 window.open(url);
 }

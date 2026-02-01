@@ -1,192 +1,123 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Love Wall</title>
+<title>Love Message Wall 💌</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body{
 margin:0;
-font-family:Arial;
+font-family:Segoe UI,Arial;
 background:linear-gradient(135deg,#ff4f8b,#3b0030);
 min-height:100vh;
 color:white;
-padding:10px;
+padding:15px;
 }
 
-h3{text-align:center;}
+h2{text-align:center;}
 
 .card{
 background:rgba(255,255,255,.2);
-padding:12px;
-border-radius:15px;
-max-width:380px;
+padding:15px;
+border-radius:20px;
+max-width:400px;
 margin:auto;
 }
 
 input,textarea{
 width:100%;
-padding:6px;
+padding:8px;
+border-radius:10px;
 border:none;
-border-radius:6px;
-margin-top:6px;
-font-size:12px;
+margin-top:8px;
 }
 
-textarea{height:50px;}
-
 button{
-margin-top:6px;
+margin-top:10px;
 width:100%;
-padding:8px;
-border:none;
+padding:10px;
 border-radius:15px;
-background:white;
-color:#ff4f8b;
-font-size:12px;
+border:none;
+background:#ffd1dc;
+cursor:pointer;
+}
+
+#messages{
+margin-top:15px;
+max-height:300px;
+overflow:auto;
 }
 
 .msg{
 background:white;
 color:black;
-padding:6px;
-border-radius:8px;
-margin-top:6px;
-font-size:11px;
-position:relative;
+padding:8px;
+border-radius:10px;
+margin:6px 0;
+font-size:13px;
 }
-
-.time{
-font-size:9px;
-opacity:.6;
-position:absolute;
-top:4px;
-right:6px;
-}
-
-.del{
-font-size:10px;
-color:red;
-position:absolute;
-bottom:4px;
-right:6px;
-display:none;
-cursor:pointer;
-}
-
-#thanks{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.6);
-display:none;
-justify-content:center;
-align-items:center;
-}
-
-#thanks div{
-background:white;
-color:black;
-padding:15px;
-border-radius:15px;
-}
-
-#messages{max-height:50vh;overflow:auto;margin-top:6px;}
+.time{font-size:10px;color:#777}
 </style>
 </head>
 
 <body>
 
-<h3>💌 Love Wall</h3>
+<h2>💌 Love Message Wall</h2>
 
 <div class="card">
 
-<input id="name" placeholder="Name">
-<textarea id="msg" placeholder="Message"></textarea>
+<input id="name" placeholder="Your name">
+<textarea id="msg" placeholder="Write your message..."></textarea>
 
-<button id="sendBtn">Send ❤️</button>
-
-<input id="admin" placeholder="Admin PIN" type="password">
+<button onclick="sendMsg()">Send ❤️</button>
 
 <div id="messages"></div>
 
 </div>
 
-<div id="thanks">
-<div>Thank you for your message 💖</div>
-</div>
+<!-- Firebase CDN NON MODULE -->
 
-<script type="module">
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+<script>
 
-const firebaseConfig = {
+var firebaseConfig = {
  apiKey: "AIzaSyAetysNyLP1kFZIWM-IhDtHH_Kq7HoSGxg",
  authDomain: "vmlove-a2df1.firebaseapp.com",
  databaseURL: "https://vmlove-a2df1-default-rtdb.asia-southeast1.firebasedatabase.app",
  projectId: "vmlove-a2df1",
- storageBucket: "vmlove-a2df1.firebasestorage.app",
+ storageBucket: "vmlove-a2df1.appspot.com",
  messagingSenderId: "932908158778",
  appId: "1:932908158778:web:eb8185babb63b8aff80a03"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const wall = ref(db,"wall");
+firebase.initializeApp(firebaseConfig);
 
-const ADMIN="1430";
+var db = firebase.database();
+var wallRef = db.ref("wall");
 
-/* SEND */
-document.getElementById("sendBtn").addEventListener("click",()=>{
+function sendMsg(){
+ let name=document.getElementById("name").value;
+ let msg=document.getElementById("msg").value;
 
-let n=name.value.trim();
-let m=msg.value.trim();
-if(!n||!m)return;
+ if(name=="" || msg=="") return alert("Fill both");
 
-push(wall,{
-name:n,
-msg:m,
-time:new Date().toLocaleString()
-});
+ wallRef.push({
+   name:name,
+   msg:msg,
+   time:new Date().toLocaleString()
+ });
 
-msg.value="";
-thanks.style.display="flex";
-setTimeout(()=>thanks.style.display="none",1500);
-});
-
-/* SHOW LIVE */
-onChildAdded(wall,(s)=>{
-let d=s.val();
-let id=s.key;
-
-let div=document.createElement("div");
-div.className="msg";
-div.innerHTML=`<b>${d.name}</b><br>${d.msg}
-<div class="time">${d.time}</div>
-<div class="del">Delete</div>`;
-
-div.querySelector(".del").onclick=()=>{
- if(admin.value===ADMIN){
- remove(ref(db,"wall/"+id));
- div.remove();
- }
-};
-
-messages.prepend(div);
-
-/* admin show delete */
-if(admin.value===ADMIN){
-div.querySelector(".del").style.display="block";
+ document.getElementById("msg").value="";
+ alert("Thank you for your message ❤️");
 }
 
+wallRef.on("child_added",function(snap){
+ let d=snap.val();
+ document.getElementById("messages").innerHTML +=
+ `<div class="msg"><b>${d.name}</b><br>${d.msg}<div class="time">${d.time}</div></div>`;
 });
-
-/* show delete when PIN typed */
-admin.oninput=function(){
-document.querySelectorAll(".del").forEach(x=>{
-x.style.display = admin.value===ADMIN ? "block":"none";
-});
-};
 
 </script>
 

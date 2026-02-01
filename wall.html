@@ -6,57 +6,51 @@
 
 <style>
 body{
-margin:0;
-font-family:Segoe UI,Arial;
+margin:0;font-family:Segoe UI,Arial;
 background:linear-gradient(135deg,#ff4f8b,#3b0030);
-min-height:100vh;
-color:white;
-padding:15px;
+min-height:100vh;color:white;padding:15px;
 }
-
 h2{text-align:center;}
 
 .card{
 background:rgba(255,255,255,.2);
-padding:15px;
-border-radius:20px;
-max-width:400px;
-margin:auto;
+padding:15px;border-radius:20px;
+max-width:400px;margin:auto;
 }
 
 input,textarea{
-width:100%;
-padding:8px;
-border-radius:10px;
-border:none;
-margin-top:8px;
+width:100%;padding:8px;border-radius:10px;border:none;margin-top:8px;
 }
 
 button{
-margin-top:10px;
-width:100%;
-padding:10px;
-border-radius:15px;
-border:none;
-background:#ffd1dc;
-cursor:pointer;
+margin-top:10px;width:100%;padding:10px;
+border-radius:15px;border:none;background:#ffd1dc;cursor:pointer;
 }
 
-#messages{
-margin-top:15px;
-max-height:300px;
-overflow:auto;
-}
+#messages{margin-top:15px;max-height:300px;overflow:auto;}
 
 .msg{
-background:white;
-color:black;
-padding:8px;
-border-radius:10px;
-margin:6px 0;
-font-size:13px;
+background:white;color:black;padding:8px;
+border-radius:10px;margin:6px 0;font-size:13px;
 }
+
 .time{font-size:10px;color:#777}
+
+.delete{color:red;font-size:11px;cursor:pointer}
+
+/* thank you popup */
+#thanks{
+position:fixed;inset:0;background:rgba(0,0,0,.6);
+display:none;justify-content:center;align-items:center;z-index:10;
+}
+#thanks div{
+background:white;color:black;padding:20px;border-radius:20px;text-align:center;
+}
+
+/* hearts burst */
+.pop{
+position:fixed;bottom:0;font-size:20px;transition:2s;
+}
 </style>
 </head>
 
@@ -71,11 +65,17 @@ font-size:13px;
 
 <button onclick="sendMsg()">Send ❤️</button>
 
+<input id="pin" placeholder="Admin PIN (Enter)" onkeydown="if(event.key=='Enter')unlock()" />
+
 <div id="messages"></div>
 
 </div>
 
-<!-- Firebase CDN NON MODULE -->
+<div id="thanks" onclick="this.style.display='none'">
+<div>
+<h3>Thank you for your message 💖</h3>
+</div>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -94,30 +94,65 @@ var firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-var db = firebase.database();
-var wallRef = db.ref("wall");
+var db=firebase.database();
+var wall=db.ref("wall");
 
-function sendMsg(){
- let name=document.getElementById("name").value;
- let msg=document.getElementById("msg").value;
+let admin=false;
+const ADMIN_PIN="1234";   // CHANGE THIS PIN
 
- if(name=="" || msg=="") return alert("Fill both");
-
- wallRef.push({
-   name:name,
-   msg:msg,
-   time:new Date().toLocaleString()
- });
-
- document.getElementById("msg").value="";
- alert("Thank you for your message ❤️");
+function unlock(){
+ if(pin.value==ADMIN_PIN){
+   admin=true;
+   alert("Admin unlocked");
+ }
 }
 
-wallRef.on("child_added",function(snap){
+function sendMsg(){
+ if(!name.value||!msg.value) return alert("Fill both");
+
+ wall.push({
+  name:name.value,
+  msg:msg.value,
+  time:new Date().toLocaleString()
+ });
+
+ msg.value="";
+ thanks.style.display="flex";
+ burst();
+}
+
+/* realtime */
+wall.on("child_added",snap=>{
  let d=snap.val();
- document.getElementById("messages").innerHTML +=
- `<div class="msg"><b>${d.name}</b><br>${d.msg}<div class="time">${d.time}</div></div>`;
+ let id=snap.key;
+
+ messages.innerHTML+=`
+ <div class="msg" id="${id}">
+ <b>${d.name}</b><br>${d.msg}
+ <div class="time">${d.time}</div>
+ ${admin?`<div class="delete" onclick="del('${id}')">Delete</div>`:""}
+ </div>`;
 });
+
+function del(id){
+ if(confirm("Delete message?")){
+ wall.child(id).remove();
+ document.getElementById(id).remove();
+ }
+}
+
+/* celebration */
+function burst(){
+ for(let i=0;i<25;i++){
+ let h=document.createElement("div");
+ h.className="pop";
+ h.innerHTML="💖";
+ h.style.left=Math.random()*100+"%";
+ document.body.appendChild(h);
+ setTimeout(()=>{h.style.bottom="100%";h.style.opacity=0},50);
+ setTimeout(()=>h.remove(),2000);
+ }
+}
 
 </script>
 

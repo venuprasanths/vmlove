@@ -61,10 +61,36 @@ cursor:pointer;
 
 #thanks{
 position:fixed;inset:0;background:rgba(0,0,0,.6);
-display:none;justify-content:center;align-items:center;
+display:none;justify-content:center;align-items:center;z-index:10;
 }
 #thanks div{
 background:white;color:black;padding:20px;border-radius:20px;text-align:center;
+}
+
+/* celebration */
+.confetti{
+position:fixed;
+top:-10px;
+font-size:22px;
+animation:fall 2s linear forwards;
+pointer-events:none;
+z-index:20;
+}
+@keyframes fall{
+to{transform:translateY(110vh) rotate(360deg);opacity:0;}
+}
+
+.burst{
+position:fixed;
+font-size:25px;
+animation:burst 1.2s ease-out forwards;
+pointer-events:none;
+z-index:20;
+}
+@keyframes burst{
+0%{transform:scale(0);}
+60%{transform:scale(1.5);}
+100%{transform:scale(0);opacity:0;}
 }
 </style>
 </head>
@@ -80,7 +106,7 @@ background:white;color:black;padding:20px;border-radius:20px;text-align:center;
 
 <button onclick="sendMsg()">Send ❤️</button>
 
-<input id="pin" placeholder="Admin PIN">
+<input id="pin" placeholder="Admin PIN (1234)">
 
 <div id="messages"></div>
 
@@ -112,8 +138,8 @@ const db=getDatabase(app);
 const wallRef=ref(db,"wall");
 
 window.sendMsg=function(){
-let n=document.getElementById("uname").value.trim();
-let m=document.getElementById("umsg").value.trim();
+let n=uname.value.trim();
+let m=umsg.value.trim();
 if(!n||!m)return alert("Fill both");
 
 push(wallRef,{
@@ -122,10 +148,12 @@ msg:m,
 time:new Date().toLocaleString()
 });
 
-document.getElementById("umsg").value="";
+umsg.value="";
 thanks.style.display="flex";
+celebrate();
 }
 
+/* realtime load */
 onChildAdded(wallRef,(s)=>{
 let d=s.val();
 let id=s.key;
@@ -139,6 +167,7 @@ ${d.msg}<br>
 </div>`+messages.innerHTML;
 });
 
+/* delete admin */
 window.delMsg=function(id){
 if(pin.value=="1234"){
 remove(ref(db,"wall/"+id));
@@ -146,9 +175,33 @@ document.getElementById(id).remove();
 }else alert("Admin only");
 }
 
+/* enter send */
 umsg.addEventListener("keydown",e=>{
-if(e.key=="Enter")sendMsg();
+if(e.key=="Enter"){e.preventDefault();sendMsg();}
 });
+
+/* celebration effect */
+function celebrate(){
+
+for(let i=0;i<40;i++){
+ let c=document.createElement("div");
+ c.className="confetti";
+ c.innerHTML=Math.random()>0.5?"💖":"✨";
+ c.style.left=Math.random()*100+"%";
+ document.body.appendChild(c);
+ setTimeout(()=>c.remove(),2000);
+}
+
+for(let i=0;i<15;i++){
+ let b=document.createElement("div");
+ b.className="burst";
+ b.innerHTML="💝";
+ b.style.left="50%";
+ b.style.top="50%";
+ document.body.appendChild(b);
+ setTimeout(()=>b.remove(),1200);
+}
+}
 
 </script>
 

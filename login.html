@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login – Love Game</title>
+
+<style>
+body{
+margin:0;
+font-family:Segoe UI,Arial;
+background:linear-gradient(135deg,#ff4f8b,#3b0030);
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+color:white;
+}
+
+.box{
+background:rgba(255,255,255,.2);
+padding:20px;
+border-radius:20px;
+width:90%;
+max-width:350px;
+text-align:center;
+}
+
+input{
+width:100%;
+padding:10px;
+border-radius:10px;
+border:none;
+margin-top:10px;
+}
+
+button{
+margin-top:12px;
+width:100%;
+padding:10px;
+border-radius:15px;
+border:none;
+background:#ffd1dc;
+cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h3>📱 Login with OTP</h3>
+
+<input id="phone" placeholder="+91XXXXXXXXXX">
+
+<div id="recaptcha-container"></div>
+
+<button onclick="sendOTP()">Send OTP</button>
+
+<input id="otp" placeholder="Enter OTP">
+
+<button onclick="verifyOTP()">Verify & Play 🎮</button>
+
+</div>
+
+<!-- Firebase v9 compat -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+ apiKey:"AIzaSyAetysNyLP1kFZIWM-IhDtHH_Kq7HoSGxg",
+ authDomain:"vmlove-a2df1.firebaseapp.com"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+  'size': 'normal'
+});
+
+function sendOTP(){
+let number=document.getElementById("phone").value;
+auth.signInWithPhoneNumber(number,window.recaptchaVerifier)
+.then(function(confirmationResult){
+window.confirmationResult=confirmationResult;
+alert("OTP Sent ✅");
+}).catch(function(error){
+alert(error.message);
+});
+}
+
+function verifyOTP(){
+let code=document.getElementById("otp").value;
+confirmationResult.confirm(code).then(function(result){
+localStorage.setItem("userPhone",result.user.phoneNumber);
+location.href="game.html";   // next page
+}).catch(function(){
+alert("Wrong OTP");
+});
+}
+</script>
+
+</body>
+</html>

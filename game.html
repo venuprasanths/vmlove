@@ -1,225 +1,132 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Memory Love Game PRO</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Snake Game 🐍</title>
 
 <style>
 body{
 margin:0;
-font-family:Segoe UI;
-background:linear-gradient(135deg,#ff4f8b,#3b0030);
-min-height:100vh;
-color:white;
+background:#111;
 display:flex;
 flex-direction:column;
 align-items:center;
+color:white;
+font-family:Segoe UI;
 }
 
 h2{margin:10px;}
 
-.grid{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:10px;
-width:260px;
+canvas{
+background:black;
+border:2px solid pink;
 }
 
-.card{
-width:60px;height:70px;
-background:#ffd1dc;
-border-radius:10px;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:28px;
-cursor:pointer;
-}
-
-.card.flip{background:white;}
-
-button{
-padding:8px 20px;
-border-radius:15px;
-border:none;
-margin:5px;
-}
-
-#leader{
-background:rgba(255,255,255,.2);
-padding:10px;
-border-radius:15px;
-width:260px;
+.controls{
 margin-top:10px;
-font-size:13px;
+display:grid;
+grid-template-columns:60px 60px 60px;
+gap:5px;
 }
 
-#timeout{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.7);
-display:none;
-justify-content:center;
-align-items:center;
-z-index:10;
-}
-
-#timeout div{
-background:white;
+.controls button{
+padding:10px;
+border:none;
+border-radius:10px;
+background:#ff7aa8;
 color:black;
-padding:25px;
-border-radius:20px;
-text-align:center;
+font-size:18px;
 }
-
 </style>
 </head>
 
 <body>
 
-<h2>❤️ Memory Love Game PRO</h2>
+<h2>🐍 Snake Game</h2>
+Score: <span id="score">0</span>
 
-Player: <span id="user"></span><br>
-⏱ <span id="time">60</span>s | Moves: <span id="moves">0</span><br>
-Score: <span id="score">0</span><br>
+<canvas id="game" width="300" height="300"></canvas>
 
-<button onclick="restart()">Restart</button>
+<!-- Mobile Controls -->
+<div class="controls">
+<div></div>
+<button onclick="dir='UP'">⬆️</button>
+<div></div>
 
-<div class="grid" id="grid"></div>
-
-<div id="leader">
-<b>🏆 Leaderboard</b>
-<div id="list"></div>
+<button onclick="dir='LEFT'">⬅️</button>
+<button onclick="dir='DOWN'">⬇️</button>
+<button onclick="dir='RIGHT'">➡️</button>
 </div>
 
-<div id="timeout">
-<div>
-<h3>⏰ Time Out</h3>
-<p>Your Score: <span id="final"></span></p>
-<button onclick="restart()">Play Again</button>
-</div>
-</div>
+<script>
 
-<script type="module">
+const c=document.getElementById("game");
+const ctx=c.getContext("2d");
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+let box=15;
+let snake=[{x:150,y:150}];
+let food=randomFood();
+let dir="RIGHT";
+let score=0;
 
-const firebaseConfig={
-apiKey:"AIzaSyAetysNyLP1kFZIWM-IhDtHH_Kq7HoSGxg",
-authDomain:"vmlove-a2df1.firebaseapp.com",
-databaseURL:"https://vmlove-a2df1-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId:"vmlove-a2df1",
-storageBucket:"vmlove-a2df1.firebasestorage.app",
-messagingSenderId:"932908158778",
-appId:"1:932908158778:web:eb8185babb63b8aff80a03"
+/* keyboard */
+document.addEventListener("keydown",e=>{
+if(e.key=="ArrowUp")dir="UP";
+if(e.key=="ArrowDown")dir="DOWN";
+if(e.key=="ArrowLeft")dir="LEFT";
+if(e.key=="ArrowRight")dir="RIGHT";
+});
+
+function randomFood(){
+return{
+x:Math.floor(Math.random()*20)*box,
+y:Math.floor(Math.random()*20)*box
 };
-
-const app=initializeApp(firebaseConfig);
-const db=getDatabase(app);
-const scoreRef=ref(db,"scores");
-
-if(!localStorage.user){
-localStorage.user=prompt("Enter name / number");
 }
-user.innerHTML=localStorage.user;
 
-/* cards */
-const icons=["❤️","💖","😍","😘","💕","💘"];
-let cards=[...icons,...icons].sort(()=>Math.random()-.5);
-
-let first=null;
-let lock=false;
-let matched=0;
-let moveCount=0;
-let scoreVal=0;
-let timeLeft=60;
-
-/* draw */
 function draw(){
-grid.innerHTML="";
-cards.forEach(v=>{
-let c=document.createElement("div");
-c.className="card";
-c.onclick=()=>flip(c,v);
-grid.appendChild(c);
-});
-}
-draw();
+ctx.clearRect(0,0,300,300);
 
-/* timer */
-let timer=setInterval(()=>{
-if(timeLeft>0){
-timeLeft--;
-time.innerHTML=timeLeft;
+/* snake */
+snake.forEach((s,i)=>{
+ctx.fillStyle=i==0?"pink":"white";
+ctx.fillRect(s.x,s.y,box,box);
+});
+
+/* food */
+ctx.fillStyle="red";
+ctx.fillRect(food.x,food.y,box,box);
+
+let head={...snake[0]};
+
+if(dir=="LEFT")head.x-=box;
+if(dir=="RIGHT")head.x+=box;
+if(dir=="UP")head.y-=box;
+if(dir=="DOWN")head.y+=box;
+
+/* eat food */
+if(head.x==food.x && head.y==food.y){
+score++;
+document.getElementById("score").innerHTML=score;
+food=randomFood();
 }else{
-clearInterval(timer);
-endGame();
-}
-},1000);
-
-function flip(el,val){
-if(lock||el.classList.contains("flip")||timeLeft<=0)return;
-
-el.classList.add("flip");
-el.innerHTML=val;
-
-if(!first){first={el,val};return;}
-
-moveCount++;
-moves.innerHTML=moveCount;
-
-if(first.val==val){
-matched++;
-first=null;
-calcScore();
-if(matched==6)endGame();
-}else{
-lock=true;
-setTimeout(()=>{
-el.classList.remove("flip");
-first.el.classList.remove("flip");
-el.innerHTML="";
-first.el.innerHTML="";
-first=null;
-lock=false;
-},600);
-}
+snake.pop();
 }
 
-function calcScore(){
-scoreVal=matched*25 + timeLeft*2 - moveCount;
-if(scoreVal<0)scoreVal=0;
-score.innerHTML=scoreVal;
+/* game over */
+if(head.x<0||head.y<0||head.x>=300||head.y>=300||hit(head)){
+alert("Game Over 😢 Score: "+score);
+location.reload();
 }
 
-function endGame(){
-calcScore();
-saveScore();
-final.innerHTML=scoreVal;
-timeout.style.display="flex";
+snake.unshift(head);
 }
 
-/* save single */
-function saveScore(){
-set(ref(db,"scores/"+localStorage.user),{
-name:localStorage.user,
-score:scoreVal
-});
+function hit(h){
+return snake.some(s=>s.x==h.x&&s.y==h.y);
 }
 
-/* leaderboard */
-onValue(scoreRef,s=>{
-let arr=[];
-s.forEach(x=>arr.push(x.val()));
-arr.sort((a,b)=>b.score-a.score);
-list.innerHTML="";
-arr.forEach(p=>{
-list.innerHTML+=`${p.name} : ${p.score}<br>`;
-});
-});
-
-function restart(){location.reload();}
+setInterval(draw,120);
 
 </script>
 

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Love Memory Game ❤️</title>
+
+<style>
+body{
+margin:0;
+font-family:Segoe UI;
+background:linear-gradient(135deg,#ff4f8b,#3b0030);
+min-height:100vh;
+display:flex;
+flex-direction:column;
+align-items:center;
+color:white;
+}
+
+h2{margin-top:10px}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(4,70px);
+gap:10px;
+margin-top:15px;
+}
+
+.card{
+width:70px;height:90px;
+background:#ffd1dc;
+border-radius:10px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:30px;
+cursor:pointer;
+}
+
+.hidden{background:#fff;}
+
+#score{margin-top:10px}
+
+.heart{
+position:fixed;
+font-size:20px;
+animation:fly 2s linear;
+}
+
+@keyframes fly{
+to{transform:translateY(-200px);opacity:0;}
+}
+</style>
+</head>
+
+<body>
+
+<h2>❤️ Love Memory Game</h2>
+
+<div id="player"></div>
+<div id="score">Score: 0</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+
+if(!localStorage.getItem("user")){
+location.href="login.html";
+}
+
+player.innerHTML="Player: "+localStorage.getItem("user");
+
+const emojis=["💖","💍","🌹","😘","❤️","😍"];
+let cards=[...emojis,...emojis].sort(()=>0.5-Math.random());
+
+let first=null,lock=false,score=0;
+
+cards.forEach((e,i)=>{
+let d=document.createElement("div");
+d.className="card hidden";
+d.dataset.val=e;
+d.onclick=()=>flip(d);
+grid.appendChild(d);
+});
+
+function flip(c){
+if(lock||!c.classList.contains("hidden"))return;
+
+c.classList.remove("hidden");
+c.innerHTML=c.dataset.val;
+
+if(!first){first=c;return;}
+
+if(first.dataset.val==c.dataset.val){
+score++;
+scoreDiv();
+burst();
+first=null;
+}else{
+lock=true;
+setTimeout(()=>{
+first.innerHTML="";
+c.innerHTML="";
+first.classList.add("hidden");
+c.classList.add("hidden");
+first=null;
+lock=false;
+},700);
+}
+}
+
+function scoreDiv(){
+document.getElementById("score").innerHTML="Score: "+score;
+}
+
+function burst(){
+for(let i=0;i<10;i++){
+let h=document.createElement("div");
+h.className="heart";
+h.innerHTML="💖";
+h.style.left=Math.random()*100+"%";
+h.style.bottom="0";
+document.body.appendChild(h);
+setTimeout(()=>h.remove(),2000);
+}
+}
+
+</script>
+
+</body>
+</html>

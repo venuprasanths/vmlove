@@ -24,7 +24,8 @@ button{width:100%;padding:10px;margin-top:8px;border:none;border-radius:15px;bac
 .replybox{margin-top:5px;}
 .reply{font-size:11px;background:#ffe6f0;padding:4px;border-radius:6px;margin-top:3px;}
 
-.avatar{width:30px;height:30px;border-radius:50%;float:left;margin-right:6px;}
+.del{float:right;color:red;font-size:11px;cursor:pointer;}
+
 </style>
 </head>
 
@@ -38,6 +39,8 @@ button{width:100%;padding:10px;margin-top:8px;border:none;border-radius:15px;bac
 <textarea id="umsg" placeholder="Message"></textarea>
 <button onclick="sendMsg()">Send ❤️</button>
 
+<input id="pin" placeholder="Admin PIN">
+
 <div id="messages"></div>
 
 </div>
@@ -45,7 +48,7 @@ button{width:100%;padding:10px;margin-top:8px;border:none;border-radius:15px;bac
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 
 const firebaseConfig={
 apiKey:"AIzaSyAetysNyLP1kFZIWM-IhDtHH_Kq7HoSGxg",
@@ -76,10 +79,10 @@ onValue(wall,snap=>{
 messages.innerHTML="";
 snap.forEach(s=>{
 let d=s.val(); let id=s.key;
-
 let liked=localStorage.getItem("like_"+id);
 
 let html=`<div class="msg">
+<span class="del" onclick="delMsg('${id}')">🗑</span>
 <b>${d.name}</b><br>${d.msg}
 <div class="time">${d.time}</div>
 
@@ -105,11 +108,18 @@ messages.innerHTML=html+messages.innerHTML;
 });
 });
 
-/* LIKE – only once */
+/* LIKE ONCE */
 window.likeMsg=function(id,c){
 if(localStorage.getItem("like_"+id))return alert("Already liked ❤️");
 localStorage.setItem("like_"+id,"1");
 update(ref(db,"wall/"+id),{likes:c+1});
+}
+
+/* ADMIN DELETE */
+window.delMsg=function(id){
+if(pin.value=="1234"){
+remove(ref(db,"wall/"+id));
+}else alert("Admin only");
 }
 
 /* REPLY TOGGLE */
@@ -123,7 +133,6 @@ window.sendReply=function(id){
 let n=document.getElementById("rname_"+id).value;
 let m=document.getElementById("rmsg_"+id).value;
 if(!n||!m)return;
-
 push(ref(db,"wall/"+id+"/replies"),{name:n,msg:m});
 }
 

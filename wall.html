@@ -53,45 +53,33 @@ font-size:13px;
 
 .time{font-size:10px;color:gray;}
 
-.del{
-float:right;
-color:red;
-cursor:pointer;
+.del{float:right;color:red;cursor:pointer;}
+
+.actions{
+display:flex;
+gap:10px;
+margin-top:5px;
+font-size:12px;
 }
 
-#thanks{
-position:fixed;inset:0;background:rgba(0,0,0,.6);
-display:none;justify-content:center;align-items:center;z-index:10;
-}
-#thanks div{
-background:white;color:black;padding:20px;border-radius:20px;text-align:center;
+.actions span{cursor:pointer;}
+
+.avatar{
+width:35px;
+height:35px;
+border-radius:50%;
+object-fit:cover;
+float:left;
+margin-right:8px;
 }
 
 /* celebration */
-.confetti{
-position:fixed;
-top:-10px;
-font-size:22px;
-animation:fall 2s linear forwards;
-pointer-events:none;
-z-index:20;
-}
-@keyframes fall{
-to{transform:translateY(110vh) rotate(360deg);opacity:0;}
-}
+.confetti{position:fixed;top:-10px;font-size:22px;animation:fall 2s linear forwards;}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:0;}}
 
-.burst{
-position:fixed;
-font-size:25px;
-animation:burst 1.2s ease-out forwards;
-pointer-events:none;
-z-index:20;
-}
-@keyframes burst{
-0%{transform:scale(0);}
-60%{transform:scale(1.5);}
-100%{transform:scale(0);opacity:0;}
-}
+.burst{position:fixed;font-size:25px;animation:burst 1.2s ease-out forwards;}
+@keyframes burst{0%{transform:scale(0);}60%{transform:scale(1.5);}100%{transform:scale(0);opacity:0;}}
+
 </style>
 </head>
 
@@ -102,26 +90,21 @@ z-index:20;
 <div class="card">
 
 <input id="uname" placeholder="Your name">
+<input type="file" id="pic">
 <textarea id="umsg" placeholder="Write message"></textarea>
 
 <button onclick="sendMsg()">Send ❤️</button>
 
-<input id="pin" placeholder="Admin PIN">
+<input id="pin" placeholder="Admin PIN (1234)">
 
 <div id="messages"></div>
 
 </div>
 
-<div id="thanks" onclick="this.style.display='none'">
-<div>
-<h3>Thank you for your message 💖</h3>
-</div>
-</div>
-
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+import { getDatabase, ref, push, onChildAdded, remove, update } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 
 const firebaseConfig={
 apiKey:"AIzaSyAetysNyLP1kFZIWM-IhDtHH_Kq7HoSGxg",
@@ -142,32 +125,53 @@ let n=uname.value.trim();
 let m=umsg.value.trim();
 if(!n||!m)return alert("Fill both");
 
+let reader=new FileReader();
+reader.onload=()=>{
 push(wallRef,{
 name:n,
 msg:m,
-time:new Date().toLocaleString()
+time:new Date().toLocaleString(),
+pic:reader.result||"",
+likes:0
 });
-
+};
+if(pic.files[0]) reader.readAsDataURL(pic.files[0]);
+else reader.onload();
 umsg.value="";
-thanks.style.display="flex";
 celebrate();
 }
 
-/* realtime load */
 onChildAdded(wallRef,(s)=>{
 let d=s.val();
 let id=s.key;
 
 messages.innerHTML=
 `<div class="msg" id="${id}">
+<img src="${d.pic}" class="avatar">
 <b>${d.name}</b>
 <span class="del" onclick="delMsg('${id}')">🗑</span><br>
 ${d.msg}<br>
 <span class="time">${d.time}</span>
+
+<div class="actions">
+<span onclick="likeMsg('${id}',${d.likes||0})">❤️ ${d.likes||0}</span>
+<span onclick="waShare('${d.name}','${d.msg}')">📲 Share</span>
+</div>
+
 </div>`+messages.innerHTML;
 });
 
-/* delete admin */
+/* like */
+window.likeMsg=function(id,c){
+update(ref(db,"wall/"+id),{likes:c+1});
+}
+
+/* whatsapp */
+window.waShare=function(n,m){
+window.open("https://wa.me/?text="+encodeURIComponent(n+": "+m));
+}
+
+/* delete */
 window.delMsg=function(id){
 if(pin.value=="1234"){
 remove(ref(db,"wall/"+id));
@@ -175,31 +179,15 @@ document.getElementById(id).remove();
 }else alert("Admin only");
 }
 
-/* enter send */
-umsg.addEventListener("keydown",e=>{
-if(e.key=="Enter"){e.preventDefault();sendMsg();}
-});
-
-/* celebration effect */
+/* effects */
 function celebrate(){
-
-for(let i=0;i<40;i++){
+for(let i=0;i<25;i++){
  let c=document.createElement("div");
  c.className="confetti";
- c.innerHTML=Math.random()>0.5?"💖":"✨";
+ c.innerHTML="💖";
  c.style.left=Math.random()*100+"%";
  document.body.appendChild(c);
  setTimeout(()=>c.remove(),2000);
-}
-
-for(let i=0;i<15;i++){
- let b=document.createElement("div");
- b.className="burst";
- b.innerHTML="💝";
- b.style.left="50%";
- b.style.top="50%";
- document.body.appendChild(b);
- setTimeout(()=>b.remove(),1200);
 }
 }
 

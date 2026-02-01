@@ -68,12 +68,12 @@ right:8px;
 
 .del{
 position:absolute;
-bottom:5px;
+bottom:6px;
 right:8px;
 font-size:11px;
 color:red;
-cursor:pointer;
 display:none;
+cursor:pointer;
 }
 
 .celebrate{
@@ -123,6 +123,7 @@ text-align:center;
 <div id="thanks" onclick="this.style.display='none'">
 <div>
 <h3>Thank you for your message 💖</h3>
+<p>With love,<br>Venu ❤️ Madhusri</p>
 </div>
 </div>
 
@@ -144,7 +145,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const wallRef = ref(db,"wall");
 
-const ADMIN="1430"; // 🔐 change PIN here
+const ADMIN="1430";   // 🔐 change PIN here
 
 window.sendMsg=function(){
  let n=name.value;

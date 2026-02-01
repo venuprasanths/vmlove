@@ -1,160 +1,180 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Love Message Wall 💌</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Love Wall 💌</title>
 
 <style>
 body{
-margin:0;font-family:Segoe UI,Arial;
+margin:0;
+font-family:Segoe UI;
 background:linear-gradient(135deg,#ff4f8b,#3b0030);
-min-height:100vh;color:white;padding:15px;
+min-height:100vh;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:10px;
 }
-h2{text-align:center;}
 
-.card{
+.box{
 background:rgba(255,255,255,.2);
-padding:15px;border-radius:20px;
-max-width:400px;margin:auto;
+padding:15px;
+border-radius:20px;
+width:100%;
+max-width:380px;
 }
 
 input,textarea{
-width:100%;padding:8px;border-radius:10px;border:none;margin-top:8px;
+width:100%;
+padding:10px;
+border-radius:10px;
+border:none;
+margin-top:8px;
 }
 
 button{
-margin-top:10px;width:100%;padding:10px;
-border-radius:15px;border:none;background:#ffd1dc;cursor:pointer;
+width:100%;
+padding:10px;
+border-radius:15px;
+border:none;
+background:#ffd1dc;
+margin-top:10px;
 }
-
-#messages{margin-top:15px;max-height:300px;overflow:auto;}
 
 .msg{
-background:white;color:black;padding:8px;
-border-radius:10px;margin:6px 0;font-size:13px;
+background:white;
+color:black;
+padding:8px;
+border-radius:10px;
+margin:6px 0;
+font-size:13px;
 }
 
-.time{font-size:10px;color:#777}
-
-.delete{color:red;font-size:11px;cursor:pointer}
-
-/* thank you popup */
 #thanks{
-position:fixed;inset:0;background:rgba(0,0,0,.6);
-display:none;justify-content:center;align-items:center;z-index:10;
-}
-#thanks div{
-background:white;color:black;padding:20px;border-radius:20px;text-align:center;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.6);
+display:none;
+justify-content:center;
+align-items:center;
 }
 
-/* hearts burst */
-.pop{
-position:fixed;bottom:0;font-size:20px;transition:2s;
+#thanks div{
+background:white;
+color:black;
+padding:20px;
+border-radius:20px;
+text-align:center;
+}
+
+.del{
+color:red;
+font-size:11px;
+cursor:pointer;
+float:right;
 }
 </style>
 </head>
 
 <body>
 
-<h2>💌 Love Message Wall</h2>
+<div class="box">
 
-<div class="card">
+<h3 align=center>💌 Love Wall</h3>
 
 <input id="name" placeholder="Your name">
-<textarea id="msg" placeholder="Write your message..."></textarea>
 
-<button onclick="sendMsg()">Send ❤️</button>
+<textarea id="msg" placeholder="Your message"></textarea>
 
-<input id="pin" placeholder="Admin PIN (Enter)" onkeydown="if(event.key=='Enter')unlock()" />
+<button onclick="send()">Send ❤️</button>
 
-<div id="messages"></div>
+<input id="pin" placeholder="Admin PIN (1234)">
+
+<div id="list"></div>
 
 </div>
 
-<div id="thanks" onclick="this.style.display='none'">
+<div id="thanks">
 <div>
 <h3>Thank you for your message 💖</h3>
+<button onclick="thanks.style.display='none'">Close</button>
 </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script type="module">
 
-<script>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 
-var firebaseConfig = {
- apiKey: "AIzaSyAetysNyLP1kFZIWM-IhDtHH_Kq7HoSGxg",
- authDomain: "vmlove-a2df1.firebaseapp.com",
- databaseURL: "https://vmlove-a2df1-default-rtdb.asia-southeast1.firebasedatabase.app",
- projectId: "vmlove-a2df1",
- storageBucket: "vmlove-a2df1.appspot.com",
- messagingSenderId: "932908158778",
- appId: "1:932908158778:web:eb8185babb63b8aff80a03"
+const firebaseConfig={
+apiKey:"AIzaSyAetysNyLP1kFZIWM-IhDtHH_Kq7HoSGxg",
+databaseURL:"https://vmlove-a2df1-default-rtdb.asia-southeast1.firebasedatabase.app"
 };
 
-firebase.initializeApp(firebaseConfig);
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+const wall=ref(db,"wall");
 
-var db=firebase.database();
-var wall=db.ref("wall");
+window.send=function(){
 
-let admin=false;
-const ADMIN_PIN="1234";   // CHANGE THIS PIN
+let n=name.value.trim();
+let m=msg.value.trim();
 
-function unlock(){
- if(pin.value==ADMIN_PIN){
-   admin=true;
-   alert("Admin unlocked");
- }
-}
+if(!n||!m){alert("Fill both");return;}
 
-function sendMsg(){
- if(!name.value||!msg.value) return alert("Fill both");
-
- wall.push({
-  name:name.value,
-  msg:msg.value,
-  time:new Date().toLocaleString()
- });
-
- msg.value="";
- thanks.style.display="flex";
- burst();
-}
-
-/* realtime */
-wall.on("child_added",snap=>{
- let d=snap.val();
- let id=snap.key;
-
- messages.innerHTML+=`
- <div class="msg" id="${id}">
- <b>${d.name}</b><br>${d.msg}
- <div class="time">${d.time}</div>
- ${admin?`<div class="delete" onclick="del('${id}')">Delete</div>`:""}
- </div>`;
+push(wall,{
+name:n,
+msg:m,
+time:new Date().toLocaleString()
 });
 
-function del(id){
- if(confirm("Delete message?")){
- wall.child(id).remove();
- document.getElementById(id).remove();
- }
+msg.value="";
+thanks.style.display="flex";
+burst();
+};
+
+onChildAdded(wall,snap=>{
+let d=snap.val();
+let id=snap.key;
+
+let div=document.createElement("div");
+div.className="msg";
+
+let del="";
+
+if(pin.value=="1234"){
+del=`<span class='del' onclick="delMsg('${id}')">Delete</span>`;
 }
 
-/* celebration */
-function burst(){
- for(let i=0;i<25;i++){
- let h=document.createElement("div");
- h.className="pop";
- h.innerHTML="💖";
- h.style.left=Math.random()*100+"%";
- document.body.appendChild(h);
- setTimeout(()=>{h.style.bottom="100%";h.style.opacity=0},50);
- setTimeout(()=>h.remove(),2000);
- }
+div.innerHTML=`${del}<b>${d.name}</b><br>${d.msg}<br><small>${d.time}</small>`;
+list.prepend(div);
+});
+
+window.delMsg=function(id){
+remove(ref(db,"wall/"+id));
+location.reload();
 }
+
+/* heart burst */
+function burst(){
+for(let i=0;i<15;i++){
+let h=document.createElement("div");
+h.innerHTML="💖";
+h.style.position="fixed";
+h.style.left=Math.random()*100+"%";
+h.style.bottom="0";
+document.body.appendChild(h);
+setTimeout(()=>h.style.bottom="100%",50);
+setTimeout(()=>h.remove(),1500);
+}
+}
+
+/* enter send */
+msg.addEventListener("keydown",e=>{
+if(e.key==="Enter"){send();}
+});
 
 </script>
-
 </body>
 </html>

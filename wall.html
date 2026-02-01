@@ -55,9 +55,27 @@ padding:8px;
 border-radius:10px;
 margin:6px 0;
 font-size:13px;
+position:relative;
 }
 
-/* celebration hearts */
+.time{
+font-size:10px;
+opacity:.6;
+position:absolute;
+top:6px;
+right:8px;
+}
+
+.del{
+position:absolute;
+bottom:5px;
+right:8px;
+font-size:11px;
+color:red;
+cursor:pointer;
+display:none;
+}
+
 .celebrate{
 position:fixed;
 bottom:0;
@@ -65,7 +83,6 @@ font-size:20px;
 transition:2s;
 }
 
-/* thank you popup */
 #thanks{
 position:fixed;
 inset:0;
@@ -97,21 +114,21 @@ text-align:center;
 
 <button onclick="sendMsg()">Send ❤️</button>
 
+<input id="admin" placeholder="Admin PIN (only you)" type="password">
+
 <div id="messages"></div>
 
 </div>
 
-<!-- thank you popup -->
 <div id="thanks" onclick="this.style.display='none'">
-  <div>
-    <h3>Thank you for your message 💖</h3>
-    <p>With love,<br>Venu ❤️ Madhusri</p>
-  </div>
+<div>
+<h3>Thank you for your message 💖</h3>
+</div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 
 const firebaseConfig = {
  apiKey: "AIzaSyAetysNyLP1kFZIWM-IhDtHH_Kq7HoSGxg",
@@ -127,41 +144,57 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const wallRef = ref(db,"wall");
 
-window.sendMsg = function(){
- let name=document.getElementById("name").value;
- let msg=document.getElementById("msg").value;
+const ADMIN="1430"; // 🔐 change PIN here
 
- if(!name || !msg) return;
+window.sendMsg=function(){
+ let n=name.value;
+ let m=msg.value;
+ if(!n||!m)return;
 
- push(wallRef,{name,msg});
- document.getElementById("msg").value="";
+ push(wallRef,{
+ name:n,
+ msg:m,
+ time:new Date().toLocaleString()
+ });
 
- document.getElementById("thanks").style.display="flex";
+ msg.value="";
+ thanks.style.display="flex";
  celebrate();
 }
 
-/* realtime show */
 onChildAdded(wallRef,(snap)=>{
  let d=snap.val();
- document.getElementById("messages").innerHTML+=
- `<div class="msg"><b>${d.name}</b><br>${d.msg}</div>`;
+ let id=snap.key;
+
+ let div=document.createElement("div");
+ div.className="msg";
+ div.innerHTML=`<b>${d.name}</b><br>${d.msg}
+ <div class="time">${d.time}</div>
+ <div class="del" onclick="del('${id}')">Delete</div>`;
+
+ messages.appendChild(div);
+
+ if(admin.value==ADMIN){
+ div.querySelector(".del").style.display="block";
+ }
 });
 
-/* heart celebration */
+window.del=function(id){
+ if(admin.value==ADMIN){
+ remove(ref(db,"wall/"+id));
+ location.reload();
+ }
+}
+
 function celebrate(){
- for(let i=0;i<20;i++){
-   let h=document.createElement("div");
-   h.className="celebrate";
-   h.innerHTML="💖";
-   h.style.left=Math.random()*100+"%";
-   document.body.appendChild(h);
-
-   setTimeout(()=>{
-     h.style.bottom="100%";
-     h.style.opacity=0;
-   },50);
-
-   setTimeout(()=>h.remove(),2000);
+ for(let i=0;i<15;i++){
+ let h=document.createElement("div");
+ h.className="celebrate";
+ h.innerHTML="💖";
+ h.style.left=Math.random()*100+"%";
+ document.body.appendChild(h);
+ setTimeout(()=>{h.style.bottom="100%";h.style.opacity=0;},50);
+ setTimeout(()=>h.remove(),2000);
  }
 }
 </script>
